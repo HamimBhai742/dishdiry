@@ -151,7 +151,7 @@ const DEFAULT_RECIPES = [
     author: "David Miller",
     authorRole: "Pastry Specialist",
     authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80",
-    image: "https://images.unsplash.com/photo-1484723091739-004a8024e759?auto=format&fit=crop&w=800&q=80",
+    image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80",
     description: "Thick-cut golden brioche slices soaked in vanilla bean custard, pan-caramelized in butter, and crowned with warm berry reduction.",
     ingredients: [
       "4 thick slices brioche bread",
@@ -482,6 +482,14 @@ class DishDiaryApp {
       this.updateHeroBookmarkState();
     });
 
+    // Hero Favorite / Like Heart Button
+    document.getElementById("featuredLikeBtn")?.addEventListener("click", (e) => {
+      const btn = e.currentTarget;
+      btn.classList.toggle("liked");
+      const isLiked = btn.classList.contains("liked");
+      this.showToast(isLiked ? "Added to your favorites! ❤️" : "Removed from favorites");
+    });
+
     // Share Hero
     document.getElementById("shareHeroBtn")?.addEventListener("click", () => {
       const currentRecipe = (this.heroRecipes && this.heroRecipes[this.currentHeroIndex]) 
@@ -690,7 +698,7 @@ class DishDiaryApp {
         author: "David Miller",
         authorSubtitle: "Pastry Specialist • Sep 16, 2026",
         authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80",
-        image: "https://images.unsplash.com/photo-1484723091739-004a8024e759?auto=format&fit=crop&w=1200&h=1000&q=85"
+        image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&h=1000&q=85"
       }
     ];
 

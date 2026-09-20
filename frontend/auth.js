@@ -88,8 +88,11 @@ class AuthManager {
 
     if (this.forgotPasswordBtn) {
       this.forgotPasswordBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.openForgotModal();
+        const typedEmail = this.loginEmail ? this.loginEmail.value.trim() : "";
+        if (typedEmail) {
+          e.preventDefault();
+          window.location.href = `./forgot-password.html?email=${encodeURIComponent(typedEmail)}`;
+        }
       });
     }
 

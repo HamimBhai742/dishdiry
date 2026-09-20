@@ -996,24 +996,43 @@ button, input, select, textarea {
 
 .social-links {
   display: flex;
+  align-items: center;
   gap: 14px;
 }
 
 .social-links a {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background-color: #292524;
-  color: #ffffff;
-  display: flex;
+  color: #ffffff !important;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition-fast);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.social-links a svg {
+  width: 20px;
+  height: 20px;
+  stroke: #ffffff;
+  fill: none;
+  transition: transform 0.25s ease, stroke 0.2s ease;
 }
 
 .social-links a:hover {
-  background-color: var(--primary);
-  transform: translateY(-2px);
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45);
+  border-color: var(--primary);
+}
+
+.social-links a:hover svg {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
 }
 
 .footer-col h4 {
@@ -1030,12 +1049,13 @@ button, input, select, textarea {
   gap: 10px;
 }
 
-.footer-col a {
+.footer-col ul a {
   font-size: 0.9rem;
   color: #a8a29e;
+  transition: color var(--transition-fast);
 }
 
-.footer-col a:hover {
+.footer-col ul a:hover {
   color: var(--primary);
 }
 

@@ -281,7 +281,6 @@ class DishDiaryApp {
     this.cacheDom();
     this.bindEvents();
     this.setupHeroCarousel();
-    this.setupLatestCarousel();
     this.render();
   }
 
@@ -514,15 +513,15 @@ class DishDiaryApp {
       window.location.href = "./add-recipe.html";
     });
 
-    // Detail Modal Close
-    this.closeDetailModalBtn.addEventListener("click", () => {
-      this.recipeDetailModal.classList.remove("open");
+    // Detail Modal Close (safe-guarded)
+    this.closeDetailModalBtn?.addEventListener("click", () => {
+      this.recipeDetailModal?.classList.remove("open");
       this.stopTimer();
     });
 
-    // Backdrop click close
+    // Backdrop click close (safe-guarded)
     [this.recipeDetailModal, this.addRecipeModal].forEach(modal => {
-      modal.addEventListener("click", (e) => {
+      modal?.addEventListener("click", (e) => {
         if (e.target === modal) {
           modal.classList.remove("open");
           if (modal === this.recipeDetailModal) this.stopTimer();
@@ -531,8 +530,8 @@ class DishDiaryApp {
     });
 
     // Mobile Menu Toggle
-    this.mobileMenuBtn.addEventListener("click", () => {
-      this.mobileMenu.classList.toggle("open");
+    this.mobileMenuBtn?.addEventListener("click", () => {
+      this.mobileMenu?.classList.toggle("open");
     });
   }
 
@@ -589,30 +588,39 @@ class DishDiaryApp {
   }
 
   getFilteredRecipes() {
+    if (!this.recipes || !Array.isArray(this.recipes)) {
+      this.recipes = [...DEFAULT_RECIPES];
+    }
     return this.recipes.filter(recipe => {
+      if (!recipe) return false;
+
       // Category filter
       if (this.activeCategory === "Saved") {
-        if (!this.savedIds.has(recipe.id)) return false;
-      } else if (this.activeCategory !== "All") {
-        const matchesCategory = recipe.category.toLowerCase().includes(this.activeCategory.toLowerCase());
-        const isVeg = this.activeCategory === "Vegetarian" && (recipe.category.includes("Salad") || recipe.title.includes("Potatoes") || recipe.title.includes("Avocado"));
+        if (!this.savedIds || !this.savedIds.has(recipe.id)) return false;
+      } else if (this.activeCategory && this.activeCategory !== "All") {
+        const cat = (recipe.category || "").toLowerCase();
+        const activeCat = this.activeCategory.toLowerCase();
+        const matchesCategory = cat.includes(activeCat);
+        const title = (recipe.title || "").toLowerCase();
+        const isVeg = activeCat === "vegetarian" && (cat.includes("salad") || title.includes("potatoes") || title.includes("avocado") || title.includes("toast"));
         if (!matchesCategory && !isVeg) return false;
       }
 
       // Search query filter
       if (this.searchQuery) {
         const query = this.searchQuery;
-        const inTitle = recipe.title.toLowerCase().includes(query);
-        const inDesc = recipe.description.toLowerCase().includes(query);
-        const inCat = recipe.category.toLowerCase().includes(query);
-        const inIngredients = recipe.ingredients.some(i => i.toLowerCase().includes(query));
+        const inTitle = (recipe.title || "").toLowerCase().includes(query);
+        const inDesc = (recipe.description || "").toLowerCase().includes(query);
+        const inCat = (recipe.category || "").toLowerCase().includes(query);
+        const ingList = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+        const inIngredients = ingList.some(i => (i || "").toLowerCase().includes(query));
         if (!inTitle && !inDesc && !inCat && !inIngredients) return false;
       }
 
       return true;
     }).sort((a, b) => {
-      if (this.sortBy === "rating") return b.rating - a.rating;
-      if (this.sortBy === "time") return (a.prepTime + a.cookTime) - (b.prepTime + b.cookTime);
+      if (this.sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
+      if (this.sortBy === "time") return ((a.prepTime || 0) + (a.cookTime || 0)) - ((b.prepTime || 0) + (b.cookTime || 0));
       return 0; // default latest order
     });
   }
@@ -828,37 +836,10 @@ class DishDiaryApp {
     this.updateHeroBookmarkState();
   }
 
-  setupLatestCarousel() {
-    const prevBtn = document.getElementById("prevRecipeBtn");
-    const nextBtn = document.getElementById("nextRecipeBtn");
-
-    if (!prevBtn || !nextBtn) return;
-
-    let pageOffset = 0;
-
-    nextBtn.addEventListener("click", () => {
-      pageOffset++;
-      nextBtn.classList.add("active");
-      prevBtn.classList.remove("active");
-
-      const cards = this.gridEl ? this.gridEl.querySelectorAll(".recipe-card") : [];
-      if (cards.length > 0) {
-        const targetIndex = Math.min(cards.length - 1, pageOffset * 2);
-        cards[targetIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
-      }
-    });
-
-    prevBtn.addEventListener("click", () => {
-      pageOffset = Math.max(0, pageOffset - 1);
-      prevBtn.classList.add("active");
-      nextBtn.classList.remove("active");
-
-      const cards = this.gridEl ? this.gridEl.querySelectorAll(".recipe-card") : [];
-      if (cards.length > 0) {
-        const targetIndex = Math.min(cards.length - 1, pageOffset * 2);
-        cards[targetIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
-      }
-    });
+  updateBookmarkCounts() {
+    const count = this.savedIds ? this.savedIds.size : 0;
+    if (this.savedCountEl) this.savedCountEl.textContent = count;
+    if (this.mobileSavedCountEl) this.mobileSavedCountEl.textContent = count;
   }
 
   updateHeroBookmarkState() {

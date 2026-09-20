@@ -2524,26 +2524,66 @@ button, input, select, textarea {
   padding-bottom: 70px;
 }
 
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.testimonials-slider-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 14px 0 28px 0;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 4%, rgba(0, 0, 0, 1) 96%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 1) 4%, rgba(0, 0, 0, 1) 96%, transparent 100%);
+}
+
+.testimonials-track {
+  display: flex;
   gap: 24px;
+  width: max-content;
+  animation: testimonialMarqueeSlide 42s linear infinite;
+  will-change: transform;
+}
+
+.testimonials-slider-wrapper:hover .testimonials-track,
+.testimonials-slider-wrapper:active .testimonials-track {
+  animation-play-state: paused;
+}
+
+@keyframes testimonialMarqueeSlide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .testimonial-card {
+  width: 370px;
+  min-width: 370px;
+  max-width: 370px;
   background-color: #ffffff;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 30px;
+  border-radius: var(--radius-lg);
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  user-select: none;
+  flex-shrink: 0;
 }
 
 .testimonial-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px rgba(234, 88, 12, 0.12);
+  border-color: rgba(234, 88, 12, 0.35);
+}
+
+@media (max-width: 640px) {
+  .testimonial-card {
+    width: 290px;
+    min-width: 290px;
+    max-width: 290px;
+    padding: 20px;
+  }
 }
 
 .testimonial-rating {

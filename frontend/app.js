@@ -331,6 +331,7 @@ class DishDiaryApp {
     this.render();
     this.fetchRecipesFromAPI();
     this.setupNavbarAuth();
+    this.initNewsletter();
   }
 
   setupNavbarAuth() {
@@ -1069,6 +1070,77 @@ class DishDiaryApp {
     setTimeout(() => {
       toast.remove();
     }, 3000);
+  }
+
+  initNewsletter() {
+    const box = document.getElementById("newsletterBox");
+    if (!box) return;
+    this.renderNewsletterForm(box);
+  }
+
+  renderNewsletterForm(box) {
+    box.innerHTML = `
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" id="newsletterEmail" placeholder="Enter your email address..." required autocomplete="email">
+        <button type="submit" class="btn btn-primary" id="newsletterSubmitBtn">
+          <span>Subscribe</span>
+        </button>
+      </form>
+      <span class="newsletter-hint" id="newsletterHint">No spam, unsubscribe anytime. Free recipes every Friday.</span>
+    `;
+
+    const form = document.getElementById("newsletterForm");
+    const emailInput = document.getElementById("newsletterEmail");
+    const submitBtn = document.getElementById("newsletterSubmitBtn");
+
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = emailInput?.value.trim();
+      if (!email) return;
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span class="btn-spinner" style="width: 15px; height: 15px; border-width: 2px;"></span> <span>Subscribing...</span>`;
+      }
+
+      setTimeout(() => {
+        try {
+          const storedSubscribers = JSON.parse(localStorage.getItem("dishdiary_subscribers") || "[]");
+          if (!storedSubscribers.includes(email)) storedSubscribers.push(email);
+          localStorage.setItem("dishdiary_subscribers", JSON.stringify(storedSubscribers));
+        } catch (_) {}
+
+        box.innerHTML = `
+          <div class="newsletter-success-card">
+            <div class="newsletter-success-icon-wrap">
+              <div class="newsletter-success-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="newsletter-success-info">
+              <h4 class="newsletter-success-title">You're on the VIP Chef List! 🎉</h4>
+              <p class="newsletter-success-desc">We've saved <strong>${email.replace(/[<>&"]/g, '')}</strong>. Fresh weekend recipes & secret kitchen tips drop every Friday!</p>
+            </div>
+            <button type="button" class="btn btn-outline newsletter-reset-btn" id="newsletterResetBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>Add Another Email</span>
+            </button>
+          </div>
+        `;
+
+        this.showToast("🎉 Welcome to DishDiary VIP Club! Check your inbox.");
+
+        document.getElementById("newsletterResetBtn")?.addEventListener("click", () => {
+          this.renderNewsletterForm(box);
+          document.getElementById("newsletterEmail")?.focus();
+        });
+      }, 500);
+    });
   }
 
   handleNewRecipeSubmit(e) {

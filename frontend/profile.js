@@ -347,12 +347,12 @@ class ProfileManager {
         if (!file) return;
 
         if (!file.type.startsWith("image/")) {
-          alert("Please select a valid image file (PNG, JPG, WEBP).");
+          this.showToast("Please select a valid image file (PNG, JPG, WEBP).");
           return;
         }
 
         if (file.size > 10 * 1024 * 1024) {
-          alert("Image size should be under 10MB.");
+          this.showToast("Image size should be under 10MB.");
           return;
         }
 

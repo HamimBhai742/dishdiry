@@ -412,14 +412,27 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentUploadedPublicId = null;
   let currentUploadedUrl = null;
 
+  const showToast = (message) => {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      <span>${message}</span>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3200);
+  };
+
   const uploadFileToBackend = async (file) => {
     if (!file || !file.type.startsWith("image/")) {
-      alert("Please select a valid image file (PNG, JPG, WEBP, GIF).");
+      showToast("Please select a valid image file (PNG, JPG, WEBP, GIF).");
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert("Image size should be under 10MB.");
+      showToast("Image size should be under 10MB.");
       return;
     }
 
@@ -624,7 +637,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const title = titleInput.value.trim();
     if (!title) {
-      alert("Please enter a recipe title.");
+      showToast("Please enter a recipe title.");
       titleInput.focus();
       return;
     }
@@ -764,7 +777,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 700);
     } catch (err) {
       console.error("Failed to submit recipe", err);
-      alert("Something went wrong while publishing the recipe. Please try again.");
+      showToast("Something went wrong while publishing the recipe. Please try again.");
       resetPublishBtn();
     }
   });

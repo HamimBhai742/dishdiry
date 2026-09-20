@@ -753,26 +753,13 @@ class DishDiaryApp {
   }
 
   startHeroAutoSlide() {
-    if (this.heroProgressInterval) clearInterval(this.heroProgressInterval);
+    if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
 
-    this.heroStartTime = Date.now();
-    const progressBar = document.getElementById("heroProgressBar");
-
-    this.heroProgressInterval = setInterval(() => {
-      if (this.isHeroPaused) return;
-
-      const elapsed = Date.now() - this.heroStartTime;
-      const percent = Math.min(100, (elapsed / this.heroDuration) * 100);
-      this.currentProgressPercent = percent;
-
-      if (progressBar) {
-        progressBar.style.width = `${percent}%`;
-      }
-
-      if (elapsed >= this.heroDuration) {
+    this.heroSlideTimer = setInterval(() => {
+      if (!this.isHeroPaused) {
         this.nextHeroSlide();
       }
-    }, 50);
+    }, this.heroDuration);
   }
 
   prevHeroSlide() {
@@ -839,10 +826,6 @@ class DishDiaryApp {
     });
 
     this.updateHeroBookmarkState();
-
-    const progressBar = document.getElementById("heroProgressBar");
-    if (progressBar) progressBar.style.width = "0%";
-    this.heroStartTime = Date.now();
   }
 
   setupLatestCarousel() {

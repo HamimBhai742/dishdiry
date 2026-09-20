@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DishDiary — Discover, Cook & Share Wonderful Recipes</title>
+  <meta name="description" content="DishDiary is your modern culinary companion to discover chef-curated recipes, create dishes, and save your favorite culinary creations.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍳</text></svg>">
+
+  <!-- Google Fonts: Editorial Serif + Modern Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="navbar-wrapper">
+    <div class="navbar container">
+      <!-- Logo -->
+      <a href="#" class="brand-logo" id="brandLogo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+        </div>
+        <span class="logo-text">Dish<strong>Diary</strong></span>
+      </a>
+
+      <!-- Desktop Links -->
+      <nav class="nav-links" id="desktopNav">
+        <a href="#home" class="nav-link active" data-nav="home">Home</a>
+        <a href="#explore" class="nav-link" data-nav="explore">Explore</a>
+        <a href="#recipes" class="nav-link" data-nav="recipes">Recipes</a>
+        <a href="#saved" class="nav-link" id="savedTabLink" data-nav="saved">Saved (<span id="savedCount">0</span>)</a>
+        <a href="#community" class="nav-link" data-nav="community">Community</a>
+      </nav>
+
+      <!-- Search Input Container -->
+      <div class="nav-search">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="recipeSearchInput" placeholder="Search recipes, ingredients..." autocomplete="off">
+        <button class="clear-search-btn" id="clearSearchBtn" title="Clear search">✕</button>
+      </div>
+
+      <!-- Right Actions -->
+      <div class="nav-actions">
+        <button class="btn btn-outline" id="signInBtn">Sign In</button>
+        <button class="btn btn-primary" id="openAddRecipeBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Recipe</span>
+        </button>
+        <!-- Mobile menu toggle -->
+        <button class="mobile-toggle-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Navigation -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#home" class="mobile-nav-link active" data-nav="home">Home</a>
+      <a href="#explore" class="mobile-nav-link" data-nav="explore">Explore</a>
+      <a href="#recipes" class="mobile-nav-link" data-nav="recipes">Recipes</a>
+      <a href="#saved" class="mobile-nav-link" id="mobileSavedTabLink" data-nav="saved">Saved Recipes (<span id="mobileSavedCount">0</span>)</a>
+      <a href="#community" class="mobile-nav-link" data-nav="community">Community</a>
+      <div class="mobile-menu-actions">
+        <button class="btn btn-outline full-width" id="mobileSignInBtn">Sign In</button>
+        <button class="btn btn-primary full-width" id="mobileAddRecipeBtn">+ Add New Recipe</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="main-content" id="home">
+    
+    <!-- Hero / Featured Recipe Showcase (Matches Figma Canvas) -->
+    <section class="hero-section container">
+      <div class="featured-card" id="featuredHeroCard">
+        <!-- Left details panel -->
+        <div class="featured-info">
+          <div class="featured-badge-group">
+            <span class="badge badge-featured">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              Featured Recipe
+            </span>
+            <span class="recipe-rating">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+              <strong>4.9</strong> (142 reviews)
+            </span>
+          </div>
+
+          <h1 class="featured-title" id="featuredTitle">Crispy Smashed Potatoes with Herb Butter</h1>
+
+          <p class="featured-description" id="featuredDesc">
+            Tender baby Yukon gold potatoes gently smashed to perfection, roasted until deeply golden and crispy, then drizzled with aromatic garlic rosemary herb butter and flaked sea salt.
+          </p>
+
+          <!-- Meta badges row -->
+          <div class="featured-meta">
+            <div class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Prep: <strong>15 mins</strong></span>
+            </div>
+            <div class="meta-divider">•</div>
+            <div class="meta-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+              </svg>
+              <span>Cook: <strong>35 mins</strong></span>
+            </div>
+            <div class="meta-divider">•</div>
+            <span class="badge badge-difficulty">Easy</span>
+          </div>
+
+          <!-- Author Info -->
+          <div class="author-block">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80" alt="Sarah Jenkins" class="author-avatar">
+            <div class="author-text">
+              <span class="author-name">Sarah Jenkins</span>
+              <span class="author-subtitle">Culinary Editor • Sep 18, 2026</span>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="featured-actions">
+            <button class="btn btn-primary btn-lg" id="cookFeaturedBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Cook Recipe
+            </button>
+            <button class="btn btn-icon-round" id="featuredBookmarkBtn" title="Save this recipe">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </button>
+            <button class="btn btn-icon-round" id="shareHeroBtn" title="Share recipe">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right image panel -->
+        <div class="featured-media">
+          <img 
+            src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=1200&h=1000&q=85" 
+            alt="Crispy Smashed Potatoes with Herb Butter" 
+            class="featured-img"
+            id="featuredImg"
+          >
+          <div class="featured-img-overlay">
+            <span class="dietary-tag">🌱 Vegetarian</span>
+            <span class="servings-tag">🍽 4 Servings</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Category Filter Bar (Pills matching Figma) -->
+    <section class="categories-section container" id="explore">
+      <div class="categories-scroll" id="categoryTabs">
+        <button class="category-pill active" data-category="All">All</button>
+        <button class="category-pill" data-category="Breakfast">Breakfast</button>
+        <button class="category-pill" data-category="Lunch">Lunch</button>
+        <button class="category-pill" data-category="Dinner">Dinner</button>
+        <button class="category-pill" data-category="Dessert">Dessert</button>
+        <button class="category-pill" data-category="Snack">Snack</button>
+        <button class="category-pill" data-category="Drinks">Drinks</button>
+        <button class="category-pill" data-category="Quick & Easy">Quick & Easy</button>
+        <button class="category-pill" data-category="Vegetarian">Vegetarian</button>
+      </div>
+    </section>
+
+    <!-- Latest Recipes Section -->
+    <section class="recipes-section container" id="recipes">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <h2 class="section-title">Latest Recipes</h2>
+          <p class="section-subtitle">Handcrafted dishes tested by culinary enthusiasts</p>
+        </div>
+        
+        <div class="section-controls">
+          <span class="recipes-count-text"><span id="filteredRecipesCount">0</span> recipes available</span>
+          <div class="filter-sort-dropdown">
+            <select id="sortBySelect" aria-label="Sort recipes">
+              <option value="latest">Sort: Newest First</option>
+              <option value="rating">Sort: Highest Rated</option>
+              <option value="time">Sort: Fastest Cooking</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recipes Grid -->
+      <div class="recipes-grid" id="recipesGrid">
+        <!-- Injected dynamically via app.js -->
+      </div>
+
+      <!-- Empty state when search or filter returns 0 -->
+      <div class="empty-state hidden" id="emptyState">
+        <div class="empty-state-icon">🍲</div>
+        <h3>No matching recipes found</h3>
+        <p>Try searching for another keyword or selecting a different category.</p>
+        <button class="btn btn-outline" id="resetFiltersBtn">Reset All Filters</button>
+      </div>
+    </section>
+
+    <!-- Interactive Cooking Spotlight / Weekly Newsletter Banner -->
+    <section class="newsletter-section container" id="community">
+      <div class="newsletter-card">
+        <div class="newsletter-content">
+          <span class="badge badge-accent">Daily Food Inspiration</span>
+          <h2>Join 45,000+ home cooks in the DishDiary club</h2>
+          <p>Get weekend menu ideas, seasonal ingredients guide, and chef techniques delivered straight to your inbox.</p>
+          <form class="newsletter-form" id="newsletterForm" onsubmit="event.preventDefault(); alert('Thank you for subscribing to DishDiary!'); this.reset();">
+            <input type="email" placeholder="Enter your email address..." required>
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+          <span class="newsletter-hint">No spam, unsubscribe anytime. Free recipes every Friday.</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col brand-col">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+          </div>
+          <span class="logo-text">Dish<strong>Diary</strong></span>
+        </div>
+        <p class="footer-desc">Your ultimate digital cookbook and food journal. Savor every flavor, organize recipes seamlessly, and connect with passionate food lovers.</p>
+        <div class="social-links">
+          <a href="#" aria-label="Instagram">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="#" aria-label="Pinterest">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line><circle cx="12" cy="12" r="10"></circle></svg>
+          </a>
+          <a href="#" aria-label="YouTube">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#recipes">Popular Recipes</a></li>
+          <li><a href="#quick">30-Minute Dinners</a></li>
+          <li><a href="#healthy">Healthy Choices</a></li>
+          <li><a href="#desserts">Baking & Desserts</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Features</h4>
+        <ul>
+          <li><a href="#meal-plan">Meal Planner</a></li>
+          <li><a href="#grocery">Smart Grocery List</a></li>
+          <li><a href="#timer">Interactive Cook Mode</a></li>
+          <li><a href="#api">Backend API Status</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>About DishDiary</h4>
+        <ul>
+          <li><a href="#about">Our Story</a></li>
+          <li><a href="#community">Creator Guidelines</a></li>
+          <li><a href="#privacy">Privacy Policy</a></li>
+          <li><a href="#terms">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom container">
+      <p>© 2026 DishDiary. Designed with love for food enthusiasts. Ready for GitHub Pages & Backend Integration.</p>
+    </div>
+  </footer>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. Recipe Detail Modal (Pop-up with cooking instructions, timer & ingredients) -->
+  <div class="modal-backdrop" id="recipeDetailModal">
+    <div class="modal-card modal-lg">
+      <button class="modal-close-btn" id="closeDetailModalBtn" aria-label="Close modal">✕</button>
+      
+      <div class="modal-scroll-body" id="modalDetailContent">
+        <!-- Injected via app.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Add New Recipe Modal -->
+  <div class="modal-backdrop" id="addRecipeModal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="closeAddRecipeModalBtn" aria-label="Close modal">✕</button>
+      
+      <div class="modal-header">
+        <span class="badge badge-accent">Create New</span>
+        <h2>Add Your Recipe to DishDiary</h2>
+        <p>Share your favorite cooking secrets with the food community.</p>
+      </div>
+
+      <form id="addRecipeForm" class="add-recipe-form">
+        <div class="form-group">
+          <label for="newTitle">Recipe Title *</label>
+          <input type="text" id="newTitle" placeholder="e.g. Creamy Truffle Mushroom Tagliatelle" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newCategory">Category *</label>
+            <select id="newCategory" required>
+              <option value="Dinner">Dinner</option>
+              <option value="Lunch">Lunch</option>
+              <option value="Breakfast">Breakfast</option>
+              <option value="Dessert">Dessert</option>
+              <option value="Snack">Snack</option>
+              <option value="Drinks">Drinks</option>
+              <option value="Quick & Easy">Quick & Easy</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="newDifficulty">Difficulty *</label>
+            <select id="newDifficulty" required>
+              <option value="Easy">Easy</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Chef Level">Chef Level</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newPrepTime">Prep Time (mins) *</label>
+            <input type="number" id="newPrepTime" placeholder="15" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="newCookTime">Cook Time (mins) *</label>
+            <input type="number" id="newCookTime" placeholder="30" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="newServings">Servings</label>
+            <input type="number" id="newServings" placeholder="4" min="1" value="4">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newImageUrl">Recipe Image URL (Unsplash or direct image link)</label>
+          <input type="url" id="newImageUrl" placeholder="https://images.unsplash.com/photo-...">
+          <small class="hint-text">Leave blank to use an auto-assigned beautiful culinary image.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="newDescription">Short Summary *</label>
+          <textarea id="newDescription" rows="2" placeholder="Briefly describe what makes this dish delightful..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="newIngredients">Ingredients (one item per line) *</label>
+          <textarea id="newIngredients" rows="3" placeholder="500g baby potatoes&#10;3 tbsp melted butter&#10;2 cloves garlic, minced&#10;Fresh rosemary & sea salt" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="newInstructions">Instructions (one step per line) *</label>
+          <textarea id="newInstructions" rows="3" placeholder="Boil potatoes until fork-tender (approx. 15 mins).&#10;Place on baking sheet and gently smash flat using a glass.&#10;Brush generously with garlic herb butter.&#10;Bake at 425°F (220°C) for 25 mins until extra crispy." required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="cancelAddRecipeBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to DishDiary</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic -->
+  <script src="./app.js"></script>
+</body>
+</html>

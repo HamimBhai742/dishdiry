@@ -1,6 +1,6 @@
-# Dependencies
+# Dependencies & Backend (Static GitHub Pages deployment)
+backend/
 node_modules/
-backend/node_modules/
 
 # Environment Variables
 .env

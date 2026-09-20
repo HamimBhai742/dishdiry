@@ -3920,10 +3920,10 @@ body.user-logged-in .nav-actions > a[href*="add-recipe.html"] {
 
 .profile-verified-badge {
   position: absolute;
-  bottom: 0;
+  top: 0;
   right: 0;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   background: #10b981;
   color: #ffffff;
   border-radius: 50%;
@@ -3932,6 +3932,50 @@ body.user-logged-in .nav-actions > a[href*="add-recipe.html"] {
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.profile-avatar-camera-btn {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 32px;
+  height: 32px;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all var(--transition-fast);
+  z-index: 5;
+  padding: 0;
+}
+
+.profile-avatar-camera-btn:hover {
+  background: var(--primary-hover);
+  transform: scale(1.12);
+  box-shadow: 0 6px 14px rgba(234, 88, 12, 0.4);
+}
+
+.profile-avatar-camera-btn.uploading {
+  pointer-events: none;
+  background: #64748b;
+}
+
+.profile-verified-name-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+  flex-shrink: 0;
 }
 
 .profile-user-info {

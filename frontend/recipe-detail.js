@@ -339,12 +339,16 @@ class RecipeDetailPage {
         const user = JSON.parse(userJson);
         const initial = (user.name || "Chef").charAt(0).toUpperCase();
 
+        const avatarHtml = user.avatarUrl
+          ? `<img src="${user.avatarUrl}" class="nav-user-avatar" style="object-fit: cover; border-radius: 50%;" alt="Avatar">`
+          : `<div class="nav-user-avatar">${initial}</div>`;
+
         const userPill = document.createElement("div");
         userPill.className = "nav-user-pill";
         userPill.id = "navUserPill";
         userPill.title = "View account details";
         userPill.innerHTML = `
-          <div class="nav-user-avatar">${initial}</div>
+          ${avatarHtml}
           <span class="nav-user-name">${user.name || "Chef"}</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="6 9 12 15 18 9"></polyline>

@@ -109,11 +109,14 @@ class ProfileManager {
 
     if (this.token && this.user) {
       const initial = (this.user.name || "C").charAt(0).toUpperCase();
+      const avatarHtml = this.user.avatarUrl
+        ? `<img src="${this.user.avatarUrl}" class="nav-user-avatar" style="object-fit: cover; border-radius: 50%;" alt="Avatar">`
+        : `<div class="nav-user-avatar">${initial}</div>`;
       const userPill = document.createElement("div");
       userPill.className = "nav-user-pill";
       userPill.id = "navUserPill";
       userPill.innerHTML = `
-        <div class="nav-user-avatar">${initial}</div>
+        ${avatarHtml}
         <span class="nav-user-name">${this.user.name || "Chef"}</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="6 9 12 15 18 9"></polyline>
@@ -212,11 +215,16 @@ class ProfileManager {
     const emailText = document.getElementById("profileEmailText");
     const joinDateText = document.getElementById("profileJoinDateText");
 
-    if (initialsEl) initialsEl.textContent = initial;
     if (user.avatarUrl && avatarImg) {
       avatarImg.src = user.avatarUrl;
       avatarImg.style.display = "block";
       if (initialsEl) initialsEl.style.display = "none";
+    } else {
+      if (avatarImg) avatarImg.style.display = "none";
+      if (initialsEl) {
+        initialsEl.textContent = initial;
+        initialsEl.style.display = "flex";
+      }
     }
 
     if (displayName) displayName.textContent = name;
@@ -323,6 +331,95 @@ class ProfileManager {
 
     if (confirmDeleteBtn) {
       confirmDeleteBtn.addEventListener("click", () => this.handleConfirmDelete());
+    }
+
+    // Avatar Photo Change via Camera Button
+    const avatarCameraBtn = document.getElementById("avatarCameraBtn");
+    const avatarFileInput = document.getElementById("avatarFileInput");
+
+    if (avatarCameraBtn && avatarFileInput) {
+      avatarCameraBtn.addEventListener("click", () => {
+        avatarFileInput.click();
+      });
+
+      avatarFileInput.addEventListener("change", async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+          alert("Please select a valid image file (PNG, JPG, WEBP).");
+          return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+          alert("Image size should be under 10MB.");
+          return;
+        }
+
+        const originalBtnHtml = avatarCameraBtn.innerHTML;
+        avatarCameraBtn.disabled = true;
+        avatarCameraBtn.classList.add("uploading");
+        avatarCameraBtn.innerHTML = `<span class="btn-spinner" style="width: 14px; height: 14px; border-width: 2px;"></span>`;
+
+        // Local instant preview
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const avatarImg = document.getElementById("profileAvatarImg");
+          const initialsEl = document.getElementById("profileAvatarInitials");
+          if (avatarImg) {
+            avatarImg.src = ev.target.result;
+            avatarImg.style.display = "block";
+          }
+          if (initialsEl) initialsEl.style.display = "none";
+        };
+        reader.readAsDataURL(file);
+
+        // Upload to backend Cloudinary endpoint
+        const formData = new FormData();
+        formData.append("image", file);
+
+        try {
+          const res = await fetch(`${API_BASE}/upload`, {
+            method: "POST",
+            body: formData,
+          });
+
+          const json = await res.json();
+          if (res.ok && json.success && json.data?.url) {
+            const uploadedUrl = json.data.url;
+            this.user = {
+              ...this.user,
+              avatarUrl: uploadedUrl,
+            };
+            localStorage.setItem("dishdiary_user", JSON.stringify(this.user));
+
+            if (this.token) {
+              fetch(`${API_BASE}/user/me`, {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${this.token}`,
+                },
+                body: JSON.stringify({ avatarUrl: uploadedUrl }),
+              }).catch(() => {});
+            }
+
+            this.renderUserProfile();
+            this.renderNavbarUser();
+            this.showToast("Profile photo updated successfully!");
+          } else {
+            throw new Error(json.message || "Failed to upload photo");
+          }
+        } catch (err) {
+          console.warn("Avatar upload error:", err);
+          this.showToast("Failed to upload avatar to Cloudinary");
+        } finally {
+          avatarCameraBtn.disabled = false;
+          avatarCameraBtn.classList.remove("uploading");
+          avatarCameraBtn.innerHTML = originalBtnHtml;
+          avatarFileInput.value = "";
+        }
+      });
     }
 
     // Sign Out Button

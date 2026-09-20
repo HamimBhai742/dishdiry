@@ -78,16 +78,23 @@
           <div class="profile-avatar-wrap">
             <div class="profile-avatar-initials" id="profileAvatarInitials">C</div>
             <img src="" class="profile-avatar-img" id="profileAvatarImg" alt="Chef Avatar" style="display: none;">
-            <div class="profile-verified-badge" title="Verified Chef">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="20 6 9 17 4 12"></polyline>
+            <button type="button" class="profile-avatar-camera-btn" id="avatarCameraBtn" title="Change profile photo">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
               </svg>
-            </div>
+            </button>
+            <input type="file" id="avatarFileInput" accept="image/*" style="display: none;">
           </div>
 
           <div class="profile-user-info">
             <div class="profile-name-row">
               <h1 class="profile-name" id="profileDisplayName">Chef</h1>
+              <span class="profile-verified-name-badge" title="Verified Chef">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </span>
               <span class="profile-role-pill" id="profileRolePill">Verified Chef</span>
             </div>
             <p class="profile-tagline" id="profileBioText">Passionate Home Cook & Culinary Recipe Creator</p>

@@ -408,6 +408,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (countEl) countEl.textContent = count;
   } catch (e) {}
 
+  // Check logged-in session to auto-fill author
+  try {
+    const userJson = localStorage.getItem("dishdiary_user");
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      if (user.name && authorNameInput) {
+        authorNameInput.value = user.name;
+        updateLivePreview();
+      }
+    }
+  } catch (e) {}
+
   // =========================================================
   // 5. FORM SUBMISSION & LOCALSTORAGE PERSISTENCE
   // =========================================================

@@ -287,6 +287,7 @@ class RecipeDetailPage {
 
     const userJson = localStorage.getItem("dishdiary_user");
     if (userJson) {
+      document.body.classList.add("user-logged-in");
       try {
         const user = JSON.parse(userJson);
         const initial = (user.name || "Chef").charAt(0).toUpperCase();
@@ -317,6 +318,10 @@ class RecipeDetailPage {
         `;
 
         signInBtn.replaceWith(userPill);
+
+        // Hide "Add Recipe" button when user is logged in
+        const addRecipeBtn = document.querySelector(".nav-actions a[href*='add-recipe.html']");
+        if (addRecipeBtn) addRecipeBtn.style.display = "none";
 
         userPill.addEventListener("click", (e) => {
           if (e.target.closest("#logoutBtn")) return;

@@ -292,6 +292,7 @@ class DishDiaryApp {
 
     const userJson = localStorage.getItem("dishdiary_user");
     if (userJson) {
+      document.body.classList.add("user-logged-in");
       try {
         const user = JSON.parse(userJson);
         const initial = (user.name || "Chef").charAt(0).toUpperCase();
@@ -322,6 +323,13 @@ class DishDiaryApp {
         `;
 
         signInBtn.replaceWith(userPill);
+
+        // Hide "Add Recipe" button on navbar when user is logged in
+        const addRecipeBtn = document.getElementById("openAddRecipeBtn");
+        if (addRecipeBtn) addRecipeBtn.style.display = "none";
+
+        const mobileAddRecipeBtn = document.getElementById("mobileAddRecipeBtn");
+        if (mobileAddRecipeBtn) mobileAddRecipeBtn.style.display = "none";
 
         userPill.addEventListener("click", (e) => {
           if (e.target.closest("#logoutBtn")) return;

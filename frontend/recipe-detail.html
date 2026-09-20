@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Details — DishDiary</title>
+  <meta name="description" content="View full recipe ingredients, step-by-step instructions, and cook timer on DishDiary.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍳</text></svg>">
+
+  <!-- Google Fonts: Editorial Serif + Modern Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Shared Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="navbar-wrapper">
+    <div class="navbar container">
+      <!-- Logo -->
+      <a href="./index.html" class="brand-logo" id="brandLogo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+        </div>
+        <span class="logo-text">Dish<strong>Diary</strong></span>
+      </a>
+
+      <!-- Desktop Links -->
+      <nav class="nav-links">
+        <a href="./index.html#home" class="nav-link">Home</a>
+        <a href="./index.html#explore" class="nav-link">Explore</a>
+        <a href="./index.html#recipes" class="nav-link active">Recipes</a>
+        <a href="./index.html#saved" class="nav-link">Saved (<span id="savedCount">0</span>)</a>
+        <a href="./index.html#community" class="nav-link">Community</a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="nav-actions">
+        <a href="./index.html" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>All Recipes</span>
+        </a>
+        <a href="./index.html#recipes" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Recipe</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Recipe Details Main Container -->
+  <main class="container page-recipe-detail">
+
+    <!-- Breadcrumb & Back button -->
+    <div class="detail-breadcrumbs">
+      <a href="./index.html" class="breadcrumb-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to Recipes
+      </a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current" id="breadcrumbTitle">Loading Recipe...</span>
+    </div>
+
+    <!-- Recipe Hero Banner -->
+    <section class="detail-header-card">
+      <div class="detail-header-content">
+        <div class="detail-tag-row">
+          <span class="badge badge-featured" id="detailCategory">Category</span>
+          <span class="badge badge-difficulty" id="detailDifficulty">Easy</span>
+          <div class="card-rating">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <strong id="detailRating">4.9</strong>
+            <span id="detailReviews">(142 reviews)</span>
+          </div>
+        </div>
+
+        <h1 class="detail-page-title" id="detailTitle">Recipe Title</h1>
+        <p class="detail-page-description" id="detailDescription">Recipe description will appear here.</p>
+
+        <!-- Quick Stats Row -->
+        <div class="detail-stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">Prep Time</span>
+            <span class="stat-value" id="detailPrepTime">15 mins</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Cook Time</span>
+            <span class="stat-value" id="detailCookTime">35 mins</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Total Time</span>
+            <span class="stat-value" id="detailTotalTime">50 mins</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Servings</span>
+            <span class="stat-value" id="detailServings">4 Servings</span>
+          </div>
+        </div>
+
+        <!-- Author & Action Buttons -->
+        <div class="detail-author-action-row">
+          <div class="author-block" style="margin-bottom:0;">
+            <img src="" alt="Author" class="author-avatar" id="detailAuthorAvatar">
+            <div class="author-text">
+              <span class="author-name" id="detailAuthorName">Author Name</span>
+              <span class="author-subtitle" id="detailAuthorRole">Culinary Creator</span>
+            </div>
+          </div>
+
+          <div class="detail-btn-group">
+            <button class="btn btn-primary" id="detailSaveBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Save Recipe</span>
+            </button>
+            <button class="btn btn-outline" id="detailShareBtn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+              <span>Share</span>
+            </button>
+            <button class="btn btn-outline" onclick="window.print()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+              </svg>
+              <span>Print</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Large Featured Image -->
+      <div class="detail-featured-media">
+        <img src="" alt="" class="detail-hero-img" id="detailHeroImg">
+      </div>
+    </section>
+
+    <!-- Two-Column Cooking Workspace -->
+    <div class="cooking-workspace-grid">
+      
+      <!-- Left Column: Ingredients, Nutrition & Timer -->
+      <div class="workspace-sidebar">
+        
+        <!-- Interactive Countdown Timer Widget -->
+        <div class="cooking-timer-card">
+          <div class="timer-header">
+            <div class="timer-title">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Cooking Timer</span>
+            </div>
+            <span class="timer-badge">Live</span>
+          </div>
+
+          <div class="timer-display-box">
+            <div class="timer-clock" id="pageTimerClock">00:00</div>
+          </div>
+
+          <div class="timer-controls">
+            <button class="btn btn-primary timer-action-btn" id="pageTimerStartBtn">Start Timer</button>
+            <button class="btn btn-outline timer-action-btn" id="pageTimerResetBtn">Reset</button>
+          </div>
+        </div>
+
+        <!-- Ingredients Checklist Card -->
+        <div class="ingredients-card">
+          <div class="ingredients-header">
+            <h2 class="ingredients-title">Ingredients</h2>
+            <span class="servings-badge" id="ingredientServings">4 Servings</span>
+          </div>
+          <p class="checklist-hint">Check off ingredients as you prep:</p>
+          <ul class="ingredients-list" id="pageIngredientsList">
+            <!-- Injected via JavaScript -->
+          </ul>
+        </div>
+
+        <!-- Nutrition Facts Card -->
+        <div class="nutrition-card">
+          <h3 class="nutrition-title">Estimated Nutrition</h3>
+          <div class="nutrition-grid">
+            <div class="nutrition-item">
+              <span class="nutri-val">340</span>
+              <span class="nutri-lbl">Calories</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="nutri-val">42g</span>
+              <span class="nutri-lbl">Carbs</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="nutri-val">12g</span>
+              <span class="nutri-lbl">Protein</span>
+            </div>
+            <div class="nutrition-item">
+              <span class="nutri-val">14g</span>
+              <span class="nutri-lbl">Fat</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Step-by-Step Instructions -->
+      <div class="workspace-main">
+        <div class="instructions-card">
+          <div class="instructions-header">
+            <h2 class="instructions-title">Step-by-Step Instructions</h2>
+            <span class="instruction-count" id="stepsCount">6 Steps</span>
+          </div>
+
+          <ol class="instructions-list" id="pageInstructionsList">
+            <!-- Injected via JavaScript -->
+          </ol>
+
+          <!-- Chef's Pro Tip Box -->
+          <div class="chef-tip-box">
+            <div class="tip-icon">💡</div>
+            <div class="tip-text">
+              <strong>Chef's Pro Tip:</strong>
+              <p>For the crispiest texture, let the boiled potatoes steam dry thoroughly on the baking sheet for 5-10 minutes before smashing. Excess moisture prevents crisping!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Recipes Recommendation -->
+        <section class="related-recipes-section">
+          <h3 class="related-title">You Might Also Enjoy</h3>
+          <div class="related-grid" id="relatedRecipesGrid">
+            <!-- Injected via JS -->
+          </div>
+        </section>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>© 2026 DishDiary. Discover, Cook & Share. Ready for Backend Integration.</p>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Detail Page Logic -->
+  <script src="./recipe-detail.js"></script>
+</body>
+</html>

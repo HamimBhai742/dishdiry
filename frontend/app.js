@@ -447,9 +447,10 @@ class DishDiaryApp {
     this.setupScrollSpy();
 
     // Hero Featured CTA
+    // Hero Featured CTA (Navigate to dedicated details page)
     this.cookFeaturedBtn.addEventListener("click", () => {
       const heroRecipe = this.recipes.find(r => r.id === "dish-1") || this.recipes[0];
-      this.openRecipeDetail(heroRecipe);
+      window.location.href = `./recipe-detail.html?id=${encodeURIComponent(heroRecipe.id)}`;
     });
 
     // Hero Bookmark Button
@@ -897,12 +898,11 @@ class DishDiaryApp {
       `;
     }).join("");
 
-    // Bind card clicks
+    // Bind card clicks to navigate to dedicated details page
     this.gridEl.querySelectorAll(".recipe-card").forEach(card => {
       card.addEventListener("click", (e) => {
         const bookmarkBtn = e.target.closest('[data-action="bookmark"]');
         const recipeId = card.dataset.recipeId;
-        const recipe = this.recipes.find(r => r.id === recipeId);
 
         if (bookmarkBtn) {
           e.stopPropagation();
@@ -910,9 +910,7 @@ class DishDiaryApp {
           return;
         }
 
-        if (recipe) {
-          this.openRecipeDetail(recipe);
-        }
+        window.location.href = `./recipe-detail.html?id=${encodeURIComponent(recipeId)}`;
       });
     });
   }

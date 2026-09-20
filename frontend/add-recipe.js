@@ -400,6 +400,134 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // =========================================================
+  // CLOUDINARY FILE UPLOAD & DRAG-AND-DROP
+  // =========================================================
+  const dropzone = document.getElementById("imageDropzone");
+  const fileInput = document.getElementById("recipeFileInput");
+  const uploadStatus = document.getElementById("uploadStatusBar");
+  const uploadText = document.getElementById("uploadStatusText");
+  const uploadSpinner = document.getElementById("uploadSpinner");
+  const uploadClearBtn = document.getElementById("uploadClearBtn");
+
+  const uploadFileToBackend = async (file) => {
+    if (!file || !file.type.startsWith("image/")) {
+      alert("Please select a valid image file (PNG, JPG, WEBP, GIF).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Image size should be under 10MB.");
+      return;
+    }
+
+    // Show uploading state
+    if (uploadStatus) {
+      uploadStatus.className = "upload-status-bar uploading";
+      uploadStatus.style.display = "flex";
+      if (uploadSpinner) uploadSpinner.style.display = "inline-block";
+      if (uploadText) uploadText.textContent = "Uploading image to Cloudinary...";
+    }
+
+    // Immediate local preview using FileReader
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/v1/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success && json.data?.url) {
+        const uploadedUrl = json.data.url;
+        imageInput.value = uploadedUrl;
+        updateLivePreview();
+
+        // Success state
+        if (uploadStatus) {
+          uploadStatus.className = "upload-status-bar success";
+          if (uploadSpinner) uploadSpinner.style.display = "none";
+          const providerName = json.data.provider === "cloudinary" ? "Cloudinary" : "Cloud Storage";
+          if (uploadText) {
+            uploadText.innerHTML = `
+              <img src="${uploadedUrl}" class="upload-preview-thumb" alt="Preview">
+              <span>Photo uploaded successfully to ${providerName}!</span>
+            `;
+          }
+        }
+
+        // Notification toast
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Dish photo uploaded to Cloudinary!</span>
+        `;
+        document.getElementById("toastContainer")?.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+      } else {
+        throw new Error(json.message || "Upload failed");
+      }
+    } catch (err) {
+      console.warn("Upload error:", err);
+      if (uploadStatus) {
+        uploadStatus.className = "upload-status-bar error";
+        if (uploadSpinner) uploadSpinner.style.display = "none";
+        if (uploadText) uploadText.textContent = "Upload to Cloudinary failed. Using preview mode.";
+      }
+    }
+  };
+
+  if (dropzone && fileInput) {
+    dropzone.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files[0]) {
+        uploadFileToBackend(e.target.files[0]);
+      }
+    });
+
+    ["dragenter", "dragover"].forEach(evt => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(evt => {
+      dropzone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove("dragover");
+      });
+    });
+
+    dropzone.addEventListener("drop", (e) => {
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        uploadFileToBackend(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  if (uploadClearBtn) {
+    uploadClearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      imageInput.value = "";
+      fileInput.value = "";
+      if (uploadStatus) uploadStatus.style.display = "none";
+      updateLivePreview();
+    });
+  }
+
   // Load Saved Recipes Count for Navbar
   try {
     const saved = localStorage.getItem("dishdiary_bookmarks");

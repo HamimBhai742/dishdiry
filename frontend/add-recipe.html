@@ -142,13 +142,49 @@
           </div>
 
           <!-- Section 2: Imagery -->
+          <!-- Section 2: Photography & Presentation (File Upload + Cloudinary) -->
           <div class="form-section-card">
             <h3 class="form-section-heading">2. Photography & Presentation</h3>
             
+            <!-- Cloudinary File Upload Dropzone -->
+            <div class="image-upload-dropzone" id="imageDropzone">
+              <input type="file" id="recipeFileInput" accept="image/png, image/jpeg, image/webp, image/gif" style="display: none;">
+              
+              <div class="dropzone-icon-circle">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+
+              <p class="dropzone-title">Click to upload or drag & drop dish photo</p>
+              <p class="dropzone-subtitle">PNG, JPG, WEBP or GIF up to 10MB</p>
+              <div class="dropzone-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                </svg>
+                <span>Cloudinary Cloud Storage</span>
+              </div>
+            </div>
+
+            <!-- Upload Status Banner -->
+            <div class="upload-status-bar" id="uploadStatusBar">
+              <div class="upload-status-left" id="uploadStatusLeft">
+                <span class="upload-spinner" id="uploadSpinner"></span>
+                <span id="uploadStatusText">Uploading image to Cloudinary...</span>
+              </div>
+              <button type="button" class="upload-clear-btn" id="uploadClearBtn">✕ Clear</button>
+            </div>
+
+            <div class="upload-divider-text">
+              <span>or enter image URL manually</span>
+            </div>
+
             <div class="form-group">
               <label for="recipeImageInput">Recipe Image URL</label>
               <input type="url" id="recipeImageInput" placeholder="https://images.unsplash.com/photo-...">
-              <small class="hint-text">Paste an Unsplash or web image URL. If left empty, an appetizing culinary photo will be selected automatically.</small>
+              <small class="hint-text">Auto-filled upon upload, or paste an Unsplash image URL directly.</small>
             </div>
 
             <div class="quick-sample-images">

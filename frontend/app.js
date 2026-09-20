@@ -280,6 +280,8 @@ class DishDiaryApp {
 
     this.cacheDom();
     this.bindEvents();
+    this.setupHeroCarousel();
+    this.setupLatestCarousel();
     this.render();
   }
 
@@ -408,14 +410,6 @@ class DishDiaryApp {
       this.render();
     });
 
-    // Carousel Arrow Buttons (Prev < / Next >)
-    document.getElementById("prevRecipeBtn")?.addEventListener("click", () => {
-      window.scrollBy({ top: -380, behavior: "smooth" });
-    });
-
-    document.getElementById("nextRecipeBtn")?.addEventListener("click", () => {
-      window.scrollBy({ top: 380, behavior: "smooth" });
-    });
 
     // Reset button in empty state
     document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
@@ -471,25 +465,32 @@ class DishDiaryApp {
     // Setup Scroll Spy to update active tab as user scrolls
     this.setupScrollSpy();
 
-    // Hero Featured CTA
-    // Hero Featured CTA (Navigate to dedicated details page)
-    this.cookFeaturedBtn.addEventListener("click", () => {
-      const heroRecipe = this.recipes.find(r => r.id === "dish-1") || this.recipes[0];
-      window.location.href = `./recipe-detail.html?id=${encodeURIComponent(heroRecipe.id)}`;
+    // Hero Featured CTA (Navigate to dedicated details page for currently active slide)
+    this.cookFeaturedBtn?.addEventListener("click", () => {
+      const currentRecipe = (this.heroRecipes && this.heroRecipes[this.currentHeroIndex]) 
+        ? this.heroRecipes[this.currentHeroIndex] 
+        : (this.recipes[0] || { id: "dish-1" });
+      window.location.href = `./recipe-detail.html?id=${encodeURIComponent(currentRecipe.id)}`;
     });
 
     // Hero Bookmark Button
-    this.featuredBookmarkBtn.addEventListener("click", () => {
-      this.toggleBookmark("dish-1");
+    this.featuredBookmarkBtn?.addEventListener("click", () => {
+      const currentRecipe = (this.heroRecipes && this.heroRecipes[this.currentHeroIndex]) 
+        ? this.heroRecipes[this.currentHeroIndex] 
+        : (this.recipes[0] || { id: "dish-1" });
+      this.toggleBookmark(currentRecipe.id);
       this.updateHeroBookmarkState();
     });
 
     // Share Hero
     document.getElementById("shareHeroBtn")?.addEventListener("click", () => {
+      const currentRecipe = (this.heroRecipes && this.heroRecipes[this.currentHeroIndex]) 
+        ? this.heroRecipes[this.currentHeroIndex] 
+        : (this.recipes[0] || { id: "dish-1", title: "Crispy Smashed Potatoes" });
       if (navigator.share) {
         navigator.share({
-          title: "Crispy Smashed Potatoes - DishDiary",
-          url: window.location.href
+          title: `${currentRecipe.title} - DishDiary`,
+          url: `${window.location.origin}${window.location.pathname.replace('index.html', '')}recipe-detail.html?id=${encodeURIComponent(currentRecipe.id)}`
         }).catch(() => {});
       } else {
         navigator.clipboard.writeText(window.location.href);
@@ -621,15 +622,261 @@ class DishDiaryApp {
     this.render();
   }
 
-  updateBookmarkCounts() {
-    const count = this.savedIds.size;
-    this.savedCountEl.textContent = count;
-    this.mobileSavedCountEl.textContent = count;
+  setupHeroCarousel() {
+    this.heroRecipes = [
+      {
+        id: "dish-1",
+        title: "Crispy Smashed Potatoes with Herb Butter",
+        description: "Tender baby Yukon gold potatoes gently smashed to perfection, roasted until deeply golden and crispy, then drizzled with aromatic garlic rosemary herb butter and flaked sea salt.",
+        prepTime: "15 mins",
+        cookTime: "35 mins",
+        difficulty: "Easy",
+        rating: "4.9",
+        reviewsCount: "142 reviews",
+        badge: "Featured Recipe",
+        dietary: "🌱 Vegetarian",
+        servings: "🍽 4 Servings",
+        author: "Sarah Jenkins",
+        authorSubtitle: "Culinary Editor • Sep 18, 2026",
+        authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80",
+        image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=1200&h=1000&q=85"
+      },
+      {
+        id: "dish-3",
+        title: "Creamy Garlic Parmesan Tuscan Chicken",
+        description: "Pan-seared tender chicken breast smothered in a luscious sun-dried tomato and baby spinach cream sauce, finished with shaved aged Parmigiano Reggiano.",
+        prepTime: "10 mins",
+        cookTime: "20 mins",
+        difficulty: "Easy",
+        rating: "4.8",
+        reviewsCount: "89 reviews",
+        badge: "Chef's Choice",
+        dietary: "🍗 High Protein",
+        servings: "🍽 4 Servings",
+        author: "Chef Julian Rossi",
+        authorSubtitle: "Master Chef • Sep 19, 2026",
+        authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&h=120&q=80",
+        image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=1200&h=1000&q=85"
+      },
+      {
+        id: "dish-4",
+        title: "Artisan Sourdough Margherita Pizza",
+        description: "Slow-fermented sourdough crust hand-stretched and fired with San Marzano tomato reduction, torn buffalo mozzarella rounds, and fresh sweet garden basil leaves.",
+        prepTime: "30 mins",
+        cookTime: "12 mins",
+        difficulty: "Intermediate",
+        rating: "4.9",
+        reviewsCount: "178 reviews",
+        badge: "Trending Today",
+        dietary: "🍕 Wood Fired",
+        servings: "🍽 3 Servings",
+        author: "Elena Rostova",
+        authorSubtitle: "Artisan Baker • Sep 17, 2026",
+        authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80",
+        image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=1200&h=1000&q=85"
+      },
+      {
+        id: "dish-5",
+        title: "Brioche French Toast with Wild Berry Compote",
+        description: "Thick-cut golden brioche slices soaked in vanilla bean custard, pan-caramelized in butter, and crowned with warm berry reduction and powdered sugar.",
+        prepTime: "10 mins",
+        cookTime: "10 mins",
+        difficulty: "Easy",
+        rating: "4.7",
+        reviewsCount: "94 reviews",
+        badge: "Breakfast Favorite",
+        dietary: "🍓 Sweet Brunch",
+        servings: "🍽 2 Servings",
+        author: "David Miller",
+        authorSubtitle: "Pastry Specialist • Sep 16, 2026",
+        authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80",
+        image: "https://images.unsplash.com/photo-1484723091739-004a8024e759?auto=format&fit=crop&w=1200&h=1000&q=85"
+      }
+    ];
+
+    this.currentHeroIndex = 0;
+    this.heroDuration = 5000; // 5 seconds per slide
+    this.heroProgressInterval = null;
+    this.heroStartTime = Date.now();
+    this.isHeroPaused = false;
+    this.currentProgressPercent = 0;
+
+    this.renderHeroDots();
+    this.applyHeroSlide(0, false);
+    this.startHeroAutoSlide();
+
+    // Pause on hover, resume on mouse leave
+    const heroCard = document.getElementById("featuredHeroCard");
+    if (heroCard) {
+      heroCard.addEventListener("mouseenter", () => {
+        this.isHeroPaused = true;
+      });
+      heroCard.addEventListener("mouseleave", () => {
+        this.isHeroPaused = false;
+        this.heroStartTime = Date.now() - (this.currentProgressPercent / 100 * this.heroDuration);
+      });
+    }
+
+    // Hero navigation buttons
+    document.getElementById("heroPrevBtn")?.addEventListener("click", () => {
+      this.prevHeroSlide();
+    });
+
+    document.getElementById("heroNextBtn")?.addEventListener("click", () => {
+      this.nextHeroSlide();
+    });
+  }
+
+  renderHeroDots() {
+    const dotsContainer = document.getElementById("heroDotsContainer");
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = "";
+
+    this.heroRecipes.forEach((_, idx) => {
+      const dot = document.createElement("button");
+      dot.className = `hero-dot ${idx === 0 ? "active" : ""}`;
+      dot.setAttribute("aria-label", `Slide ${idx + 1}`);
+      dot.addEventListener("click", () => {
+        this.applyHeroSlide(idx, true);
+        this.startHeroAutoSlide();
+      });
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  startHeroAutoSlide() {
+    if (this.heroProgressInterval) clearInterval(this.heroProgressInterval);
+
+    this.heroStartTime = Date.now();
+    const progressBar = document.getElementById("heroProgressBar");
+
+    this.heroProgressInterval = setInterval(() => {
+      if (this.isHeroPaused) return;
+
+      const elapsed = Date.now() - this.heroStartTime;
+      const percent = Math.min(100, (elapsed / this.heroDuration) * 100);
+      this.currentProgressPercent = percent;
+
+      if (progressBar) {
+        progressBar.style.width = `${percent}%`;
+      }
+
+      if (elapsed >= this.heroDuration) {
+        this.nextHeroSlide();
+      }
+    }, 50);
+  }
+
+  prevHeroSlide() {
+    const nextIdx = (this.currentHeroIndex - 1 + this.heroRecipes.length) % this.heroRecipes.length;
+    this.applyHeroSlide(nextIdx, true);
+    this.startHeroAutoSlide();
+  }
+
+  nextHeroSlide() {
+    const nextIdx = (this.currentHeroIndex + 1) % this.heroRecipes.length;
+    this.applyHeroSlide(nextIdx, true);
+    this.startHeroAutoSlide();
+  }
+
+  applyHeroSlide(index, animate = true) {
+    this.currentHeroIndex = index;
+    const r = this.heroRecipes[index];
+    if (!r) return;
+
+    const infoPanel = document.getElementById("heroInfoPanel");
+    const imgEl = document.getElementById("featuredImg");
+
+    if (animate) {
+      if (infoPanel) {
+        infoPanel.classList.remove("hero-transition-fade");
+        void infoPanel.offsetWidth;
+        infoPanel.classList.add("hero-transition-fade");
+      }
+      if (imgEl) {
+        imgEl.style.opacity = "0.7";
+        setTimeout(() => { imgEl.style.opacity = "1"; }, 150);
+      }
+    }
+
+    const setSafe = (id, val) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+
+    setSafe("featuredTitle", r.title);
+    setSafe("featuredDesc", r.description);
+    setSafe("heroBadgeText", r.badge);
+    setSafe("heroRatingVal", r.rating);
+    setSafe("heroReviewsCount", r.reviewsCount);
+    setSafe("heroPrepVal", r.prepTime);
+    setSafe("heroCookVal", r.cookTime);
+    setSafe("heroDifficultyBadge", r.difficulty);
+    setSafe("heroAuthorName", r.author);
+    setSafe("heroAuthorSubtitle", r.authorSubtitle);
+    setSafe("heroDietaryTag", r.dietary);
+    setSafe("heroServingsTag", r.servings);
+
+    const avatarEl = document.getElementById("heroAuthorAvatar");
+    if (avatarEl) avatarEl.src = r.authorAvatar;
+
+    if (imgEl) {
+      imgEl.src = r.image;
+      imgEl.alt = r.title;
+    }
+
+    const dots = document.querySelectorAll(".hero-dot");
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("active", i === index);
+    });
+
+    this.updateHeroBookmarkState();
+
+    const progressBar = document.getElementById("heroProgressBar");
+    if (progressBar) progressBar.style.width = "0%";
+    this.heroStartTime = Date.now();
+  }
+
+  setupLatestCarousel() {
+    const prevBtn = document.getElementById("prevRecipeBtn");
+    const nextBtn = document.getElementById("nextRecipeBtn");
+
+    if (!prevBtn || !nextBtn) return;
+
+    let pageOffset = 0;
+
+    nextBtn.addEventListener("click", () => {
+      pageOffset++;
+      nextBtn.classList.add("active");
+      prevBtn.classList.remove("active");
+
+      const cards = this.gridEl ? this.gridEl.querySelectorAll(".recipe-card") : [];
+      if (cards.length > 0) {
+        const targetIndex = Math.min(cards.length - 1, pageOffset * 2);
+        cards[targetIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+      }
+    });
+
+    prevBtn.addEventListener("click", () => {
+      pageOffset = Math.max(0, pageOffset - 1);
+      prevBtn.classList.add("active");
+      nextBtn.classList.remove("active");
+
+      const cards = this.gridEl ? this.gridEl.querySelectorAll(".recipe-card") : [];
+      if (cards.length > 0) {
+        const targetIndex = Math.min(cards.length - 1, pageOffset * 2);
+        cards[targetIndex]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+      }
+    });
   }
 
   updateHeroBookmarkState() {
-    const isSaved = this.savedIds.has("dish-1");
+    if (!this.featuredBookmarkBtn) return;
+    const currentRecipe = this.heroRecipes ? this.heroRecipes[this.currentHeroIndex] : null;
+    const recipeId = currentRecipe ? currentRecipe.id : "dish-1";
+    const isSaved = this.savedIds.has(recipeId);
     this.featuredBookmarkBtn.classList.toggle("active", isSaved);
+    this.featuredBookmarkBtn.title = isSaved ? "Remove from saved recipes" : "Save this recipe";
   }
 
   showToast(message) {

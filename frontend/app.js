@@ -488,19 +488,13 @@ class DishDiaryApp {
       }
     });
 
-    // Add Recipe Modal
-    const openAddModal = () => this.addRecipeModal.classList.add("open");
-    const closeAddModal = () => this.addRecipeModal.classList.remove("open");
-
-    this.openAddRecipeBtn.addEventListener("click", openAddModal);
-    this.mobileAddRecipeBtn.addEventListener("click", () => {
-      this.mobileMenu.classList.remove("open");
-      openAddModal();
+    // Add Recipe Button -> Navigate to dedicated creator page
+    this.openAddRecipeBtn?.addEventListener("click", () => {
+      window.location.href = "./add-recipe.html";
     });
-    this.closeAddRecipeModalBtn.addEventListener("click", closeAddModal);
-    this.cancelAddRecipeBtn.addEventListener("click", closeAddModal);
-
-    this.addRecipeForm.addEventListener("submit", (e) => this.handleNewRecipeSubmit(e));
+    this.mobileAddRecipeBtn?.addEventListener("click", () => {
+      window.location.href = "./add-recipe.html";
+    });
 
     // Detail Modal Close
     this.closeDetailModalBtn.addEventListener("click", () => {

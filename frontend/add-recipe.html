@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Recipe — DishDiary</title>
+  <meta name="description" content="Share your secret culinary recipe, ingredients, and directions with food lovers on DishDiary.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍳</text></svg>">
+
+  <!-- Google Fonts: Editorial Serif + Modern Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Shared Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="navbar-wrapper">
+    <div class="navbar container">
+      <!-- Logo -->
+      <a href="./index.html" class="brand-logo" id="brandLogo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+        </div>
+        <span class="logo-text">Dish<strong>Diary</strong></span>
+      </a>
+
+      <!-- Desktop Links -->
+      <nav class="nav-links">
+        <a href="./index.html#home" class="nav-link">Home</a>
+        <a href="./index.html#explore" class="nav-link">Explore</a>
+        <a href="./index.html#recipes" class="nav-link">Recipes</a>
+        <a href="./index.html#saved" class="nav-link">Saved (<span id="savedCount">0</span>)</a>
+        <a href="./index.html#community" class="nav-link">Community</a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="nav-actions">
+        <a href="./index.html" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Cancel & Back</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Add Recipe Main Page Content -->
+  <main class="container page-add-recipe">
+    
+    <!-- Breadcrumb -->
+    <div class="detail-breadcrumbs">
+      <a href="./index.html" class="breadcrumb-back">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Back to Cookbook
+      </a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">Add New Recipe</span>
+    </div>
+
+    <!-- Creator Header Banner -->
+    <section class="add-recipe-header">
+      <span class="badge badge-featured">Creator Studio</span>
+      <h1 class="add-recipe-main-title">Share Your Culinary Recipe</h1>
+      <p class="add-recipe-subtitle">Fill in the recipe secrets, ingredients checklist, and cooking directions. Once published, it appears instantly on the feed and generates its own recipe page.</p>
+    </section>
+
+    <!-- Two-column Creator Workspace: Form on left, Live Card Preview on right -->
+    <div class="add-recipe-grid">
+      
+      <!-- Left: Full Recipe Creator Form -->
+      <div class="creator-form-column">
+        <form id="standaloneAddRecipeForm" class="standalone-recipe-form">
+          
+          <!-- Section 1: Core Details -->
+          <div class="form-section-card">
+            <h3 class="form-section-heading">1. General Information</h3>
+            
+            <div class="form-group">
+              <label for="recipeTitleInput">Recipe Title *</label>
+              <input type="text" id="recipeTitleInput" placeholder="e.g. Creamy Truffle Wild Mushroom Tagliatelle" required>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="recipeCategoryInput">Category *</label>
+                <select id="recipeCategoryInput" required>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Dessert">Dessert</option>
+                  <option value="Snack">Snack</option>
+                  <option value="Drinks">Drinks</option>
+                  <option value="Quick & Easy">Quick & Easy</option>
+                  <option value="Vegetarian">Vegetarian</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="recipeDifficultyInput">Difficulty *</label>
+                <select id="recipeDifficultyInput" required>
+                  <option value="Easy">Easy</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Chef Level">Chef Level</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="recipePrepTimeInput">Prep Time (mins) *</label>
+                <input type="number" id="recipePrepTimeInput" placeholder="15" min="1" value="15" required>
+              </div>
+              <div class="form-group">
+                <label for="recipeCookTimeInput">Cook Time (mins) *</label>
+                <input type="number" id="recipeCookTimeInput" placeholder="25" min="0" value="25" required>
+              </div>
+              <div class="form-group">
+                <label for="recipeServingsInput">Servings *</label>
+                <input type="number" id="recipeServingsInput" placeholder="4" min="1" value="4" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="recipeDescriptionInput">Short Recipe Description *</label>
+              <textarea id="recipeDescriptionInput" rows="3" placeholder="Describe the flavors, texture, and why home cooks will fall in love with this dish..." required></textarea>
+            </div>
+          </div>
+
+          <!-- Section 2: Imagery -->
+          <div class="form-section-card">
+            <h3 class="form-section-heading">2. Photography & Presentation</h3>
+            
+            <div class="form-group">
+              <label for="recipeImageInput">Recipe Image URL</label>
+              <input type="url" id="recipeImageInput" placeholder="https://images.unsplash.com/photo-...">
+              <small class="hint-text">Paste an Unsplash or web image URL. If left empty, an appetizing culinary photo will be selected automatically.</small>
+            </div>
+
+            <div class="quick-sample-images">
+              <span class="sample-label">Or choose a sample culinary photo:</span>
+              <div class="sample-buttons">
+                <button type="button" class="sample-img-btn" data-url="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1200&q=80">Pasta & Sauce</button>
+                <button type="button" class="sample-img-btn" data-url="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=80">Fresh Salad Bowl</button>
+                <button type="button" class="sample-img-btn" data-url="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=80">Artisan Pizza</button>
+                <button type="button" class="sample-img-btn" data-url="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=1200&q=80">Dessert Bake</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Ingredients & Directions -->
+          <div class="form-section-card">
+            <h3 class="form-section-heading">3. Ingredients & Instructions</h3>
+            
+            <div class="form-group">
+              <label for="recipeIngredientsInput">Ingredients Checklist (one per line) *</label>
+              <textarea id="recipeIngredientsInput" rows="5" placeholder="400g fettuccine or tagliatelle&#10;2 tbsp extra virgin olive oil&#10;300g mixed mushrooms (cremini, shiitake)&#10;3 cloves garlic, finely minced&#10;1/2 cup heavy cream or crème fraîche&#10;Fresh thyme leaves, grated parmesan & black pepper" required></textarea>
+              <small class="hint-text">Type each ingredient on a new line. They will automatically render as interactive checklist items.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="recipeInstructionsInput">Step-by-Step Cooking Instructions (one per line) *</label>
+              <textarea id="recipeInstructionsInput" rows="5" placeholder="Bring a large pot of salted water to a rolling boil and cook pasta al dente.&#10;In a heavy skillet, sear sliced mushrooms in olive oil over high heat until golden brown.&#10;Add minced garlic and fresh thyme; cook for 1 minute until aromatic.&#10;Pour in heavy cream and gently simmer for 2 minutes to thicken.&#10;Toss pasta directly into the sauce with a splash of starchy pasta water and parmesan. Serve piping hot." required></textarea>
+              <small class="hint-text">Each line will become a numbered instruction step with a built-in cook timer.</small>
+            </div>
+          </div>
+
+          <!-- Section 4: Author Profile -->
+          <div class="form-section-card">
+            <h3 class="form-section-heading">4. Chef Profile</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="authorNameInput">Your Name *</label>
+                <input type="text" id="authorNameInput" value="Chef Sarah" required>
+              </div>
+              <div class="form-group">
+                <label for="authorRoleInput">Your Title / Bio</label>
+                <input type="text" id="authorRoleInput" value="Passionate Home Cook" placeholder="e.g. Pastry Enthusiast">
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="creator-actions">
+            <a href="./index.html" class="btn btn-outline btn-lg">Cancel</a>
+            <button type="submit" class="btn btn-primary btn-lg" id="publishBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Publish Recipe</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Right: Real-time Live Card Preview -->
+      <aside class="creator-preview-column">
+        <div class="preview-sticky-wrap">
+          <div class="preview-header-label">
+            <span>LIVE RECIPE PREVIEW</span>
+            <small>Updates automatically as you type</small>
+          </div>
+
+          <article class="recipe-card preview-card">
+            <div class="card-media">
+              <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80" alt="Preview Image" class="card-img" id="previewImg">
+              <span class="card-category-badge" id="previewCategory">Dinner</span>
+            </div>
+
+            <div class="card-body">
+              <div class="card-meta-top">
+                <span class="badge badge-difficulty" id="previewDifficulty">Easy</span>
+                <div class="card-rating">
+                  <svg width="14" height="14" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <span>5.0 (New)</span>
+                </div>
+              </div>
+
+              <h3 class="card-title" id="previewTitle">Creamy Truffle Wild Mushroom Tagliatelle</h3>
+              <p class="card-desc" id="previewDescription">A velvety garlic and herb cream sauce tossed with pan-seared mushrooms and artisan egg pasta.</p>
+
+              <div class="card-footer">
+                <div class="card-time">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span id="previewTotalTime">40 mins total</span>
+                </div>
+                <span style="font-weight:600; color: var(--primary);">View Recipe →</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Helper Tips Card -->
+          <div class="creator-guideline-card">
+            <h4>Cooking Tip for Great Recipes:</h4>
+            <ul>
+              <li>Provide exact measurements (grams, cups, tbsp).</li>
+              <li>Break directions into digestible steps (under 2 sentences per step).</li>
+              <li>Mention visual cues (e.g. "until bubbling and deep golden").</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>© 2026 DishDiary Creator Studio. Ready for Backend Integration.</p>
+    </div>
+  </footer>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Add Recipe Logic -->
+  <script src="./add-recipe.js"></script>
+</body>
+</html>

@@ -362,16 +362,25 @@ class RecipeDetailPage {
 
   renderIngredients() {
     const list = document.getElementById("pageIngredientsList");
-    list.innerHTML = this.currentRecipe.ingredients.map(ing => `
-      <li class="ingredient-item">
-        <input type="checkbox">
-        <span>${ing}</span>
-      </li>
-    `).join("");
+    list.innerHTML = this.currentRecipe.ingredients.map(raw => {
+      const trimmed = raw.trim();
+      // Section header detection: e.g. [For the Dough] or [For the Sauce]
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        const headerText = trimmed.replace(/^\[+|\]+$/g, "");
+        return `<li class="ingredient-header-item"><strong>${headerText}</strong></li>`;
+      }
+
+      return `
+        <li class="ingredient-item">
+          <input type="checkbox">
+          <span>${trimmed}</span>
+        </li>
+      `;
+    }).join("");
 
     list.querySelectorAll(".ingredient-item").forEach(item => {
       const box = item.querySelector("input[type='checkbox']");
-      box.addEventListener("change", () => {
+      box?.addEventListener("change", () => {
         item.classList.toggle("checked", box.checked);
       });
     });
@@ -379,9 +388,46 @@ class RecipeDetailPage {
 
   renderInstructions() {
     const list = document.getElementById("pageInstructionsList");
-    list.innerHTML = this.currentRecipe.instructions.map(step => `
-      <li class="instruction-step">${step}</li>
-    `).join("");
+    list.innerHTML = this.currentRecipe.instructions.map(step => {
+      let formatted = step;
+
+      // Replace [timer: X mins] or [timer: Xm] with clickable timer badge
+      formatted = formatted.replace(/\[timer:\s*(\d+)\s*(?:mins?|m)?\]/gi, (match, mins) => {
+        return `<button type="button" class="inline-step-timer" data-timer-mins="${mins}" title="Click to start ${mins}-min timer">⏱️ ${mins} Mins (Start Timer)</button>`;
+      });
+
+      // Replace [tip: ...] with pro tip pill
+      formatted = formatted.replace(/\[tip:\s*([^\]]+)\]/gi, (match, tipText) => {
+        return `<span class="inline-step-tip">💡 <strong>Tip:</strong> ${tipText}</span>`;
+      });
+
+      // Replace [heat: ...] or [temp: ...]
+      formatted = formatted.replace(/\[(?:heat|temp):\s*([^\]]+)\]/gi, (match, heatText) => {
+        return `<span class="inline-step-heat">🔥 ${heatText}</span>`;
+      });
+
+      return `<li class="instruction-step"><div class="instruction-step-text">${formatted}</div></li>`;
+    }).join("");
+
+    // Bind click handlers to inline timer buttons
+    list.querySelectorAll(".inline-step-timer").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const mins = parseInt(btn.dataset.timerMins, 10);
+        if (mins) {
+          this.startCustomTimer(mins);
+          this.showToast(`Timer set to ${mins} minutes!`);
+          document.querySelector(".cooking-timer-card")?.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+  }
+
+  startCustomTimer(minutes) {
+    this.setupTimer(minutes);
+    const startBtn = document.getElementById("pageTimerStartBtn");
+    if (startBtn && startBtn.textContent === "Start Timer") {
+      startBtn.click();
+    }
   }
 
   renderRelatedRecipes() {

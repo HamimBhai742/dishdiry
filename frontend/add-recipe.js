@@ -1,11 +1,16 @@
 /**
  * DishDiary - Add Recipe Page Logic
- * Powers live preview, sample image selection, and saving
- * custom recipes to localStorage before routing to recipe-detail.html.
+ * Features:
+ * - Dynamic Ingredient Row Builder with Amount + Name + Quick Pantry Chips
+ * - Dynamic Step-by-Step Cards Builder with Formatting (Bold, Italic, Timer, Pro Tip)
+ * - Two-way sync between Row/Card Builders and Bulk Textarea modes
+ * - Real-time Live Preview Card
+ * - Sample culinary photos
+ * - Persistence to localStorage and routing to recipe-detail.html
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Elements
+  // Core Elements
   const form = document.getElementById("standaloneAddRecipeForm");
   const titleInput = document.getElementById("recipeTitleInput");
   const categoryInput = document.getElementById("recipeCategoryInput");
@@ -15,10 +20,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const servingsInput = document.getElementById("recipeServingsInput");
   const descInput = document.getElementById("recipeDescriptionInput");
   const imageInput = document.getElementById("recipeImageInput");
-  const ingredientsInput = document.getElementById("recipeIngredientsInput");
-  const instructionsInput = document.getElementById("recipeInstructionsInput");
   const authorNameInput = document.getElementById("authorNameInput");
   const authorRoleInput = document.getElementById("authorRoleInput");
+
+  // Ingredients Elements
+  const ingRowsList = document.getElementById("ingredientsRowsList");
+  const addIngRowBtn = document.getElementById("addIngredientRowBtn");
+  const ingModeRowsBtn = document.getElementById("ingModeRowsBtn");
+  const ingModeTextBtn = document.getElementById("ingModeTextBtn");
+  const ingRowsWrapper = document.getElementById("ingredientsRowsWrapper");
+  const ingTextareaWrapper = document.getElementById("ingredientsTextareaWrapper");
+  const ingTextarea = document.getElementById("recipeIngredientsInput");
+
+  // Instructions Elements
+  const stepsCardsList = document.getElementById("instructionsCardsList");
+  const addStepBtn = document.getElementById("addInstructionStepBtn");
+  const stepModeCardsBtn = document.getElementById("stepModeCardsBtn");
+  const stepModeTextBtn = document.getElementById("stepModeTextBtn");
+  const stepsCardsWrapper = document.getElementById("instructionsCardsWrapper");
+  const stepsTextareaWrapper = document.getElementById("instructionsTextareaWrapper");
+  const stepsTextarea = document.getElementById("recipeInstructionsInput");
 
   // Preview Card Elements
   const previewTitle = document.getElementById("previewTitle");
@@ -30,14 +51,327 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const defaultSampleImg = "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80";
 
-  // Update Live Preview Function
+  // Track active input focus for toolbar insertions
+  let lastActiveInput = null;
+
+  // =========================================================
+  // 1. INGREDIENTS ROW BUILDER LOGIC
+  // =========================================================
+
+  const createIngredientRow = (amount = "", name = "") => {
+    const row = document.createElement("div");
+    row.className = "ingredient-row-item";
+    row.innerHTML = `
+      <input type="text" class="ing-amount-input" placeholder="e.g. 2 tbsp" value="${amount}">
+      <input type="text" class="ing-name-input" placeholder="Ingredient name (e.g. extra virgin olive oil)" value="${name}">
+      <button type="button" class="row-delete-btn" title="Remove ingredient">✕</button>
+    `;
+
+    const amtInp = row.querySelector(".ing-amount-input");
+    const nameInp = row.querySelector(".ing-name-input");
+    const delBtn = row.querySelector(".row-delete-btn");
+
+    // Track focused input for toolbar
+    [amtInp, nameInp].forEach(inp => {
+      inp.addEventListener("focus", () => { lastActiveInput = inp; });
+      inp.addEventListener("input", syncIngredientsToTextarea);
+    });
+
+    // Enter in name field spawns next row
+    nameInp.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const nextRow = createIngredientRow();
+        ingRowsList.appendChild(nextRow);
+        nextRow.querySelector(".ing-amount-input").focus();
+        syncIngredientsToTextarea();
+      }
+    });
+
+    delBtn.addEventListener("click", () => {
+      if (ingRowsList.children.length > 1) {
+        row.remove();
+        syncIngredientsToTextarea();
+      }
+    });
+
+    return row;
+  };
+
+  const syncIngredientsToTextarea = () => {
+    const lines = [];
+    ingRowsList.querySelectorAll(".ingredient-row-item").forEach(row => {
+      const amt = row.querySelector(".ing-amount-input").value.trim();
+      const name = row.querySelector(".ing-name-input").value.trim();
+      if (amt && name) {
+        lines.push(`${amt} ${name}`);
+      } else if (name) {
+        lines.push(name);
+      } else if (amt) {
+        lines.push(amt);
+      }
+    });
+    ingTextarea.value = lines.join("\n");
+  };
+
+  const syncTextareaToIngredients = () => {
+    const lines = ingTextarea.value.split("\n").filter(l => l.trim().length > 0);
+    ingRowsList.innerHTML = "";
+    if (lines.length === 0) {
+      ingRowsList.appendChild(createIngredientRow());
+      return;
+    }
+
+    lines.forEach(line => {
+      // Split first token if likely an amount (e.g. "2 tbsp olive oil" -> "2 tbsp", "olive oil")
+      const parts = line.split(" ");
+      let amt = "";
+      let name = line;
+
+      if (parts.length >= 2 && (/^\d/.test(parts[0]) || parts[0].includes("/") || parts[0].includes("tbsp") || parts[0].includes("tsp") || parts[0].includes("cup") || parts[0].includes("g") || parts[0].includes("ml") || parts[0].includes("lbs"))) {
+        if (parts.length >= 3 && (parts[1].toLowerCase().includes("tbsp") || parts[1].toLowerCase().includes("tsp") || parts[1].toLowerCase().includes("cup") || parts[1].toLowerCase().includes("oz") || parts[1].toLowerCase().includes("g") || parts[1].toLowerCase().includes("lbs"))) {
+          amt = parts[0] + " " + parts[1];
+          name = parts.slice(2).join(" ");
+        } else {
+          amt = parts[0];
+          name = parts.slice(1).join(" ");
+        }
+      }
+
+      ingRowsList.appendChild(createIngredientRow(amt, name));
+    });
+  };
+
+  addIngRowBtn.addEventListener("click", () => {
+    const newRow = createIngredientRow();
+    ingRowsList.appendChild(newRow);
+    newRow.querySelector(".ing-amount-input").focus();
+  });
+
+  // Toggle Ingredients Mode (Row Builder vs Bulk Text)
+  ingModeRowsBtn.addEventListener("click", () => {
+    ingModeRowsBtn.classList.add("active");
+    ingModeTextBtn.classList.remove("active");
+    syncTextareaToIngredients();
+    ingRowsWrapper.classList.remove("hidden");
+    ingTextareaWrapper.classList.add("hidden");
+  });
+
+  ingModeTextBtn.addEventListener("click", () => {
+    ingModeTextBtn.classList.add("active");
+    ingModeRowsBtn.classList.remove("active");
+    syncIngredientsToTextarea();
+    ingRowsWrapper.classList.add("hidden");
+    ingTextareaWrapper.classList.remove("hidden");
+  });
+
+  // Toolbar Format buttons for Ingredients
+  document.querySelectorAll(".editor-toolbar .toolbar-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tag = btn.dataset.tag;
+      const target = lastActiveInput || ingRowsList.querySelector(".ing-name-input");
+      if (!target) return;
+
+      const val = target.value;
+      const start = target.selectionStart || 0;
+      const end = target.selectionEnd || val.length;
+      const selected = val.substring(start, end);
+
+      if (tag === "bold") {
+        target.value = val.substring(0, start) + `<b>${selected || 'bold text'}</b>` + val.substring(end);
+      } else if (tag === "italic") {
+        target.value = val.substring(0, start) + `<i>${selected || 'italic text'}</i>` + val.substring(end);
+      } else if (tag === "header") {
+        target.value = `[For ${selected || 'the Sauce'}]`;
+      }
+
+      target.focus();
+      syncIngredientsToTextarea();
+    });
+  });
+
+  // Quick Pantry Chips
+  document.querySelectorAll(".quick-pantry-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      const text = chip.dataset.text;
+      const row = createIngredientRow("", text);
+      ingRowsList.appendChild(row);
+      syncIngredientsToTextarea();
+    });
+  });
+
+  // =========================================================
+  // 2. INSTRUCTIONS STEP CARDS BUILDER LOGIC
+  // =========================================================
+
+  const recalculateStepNumbers = () => {
+    stepsCardsList.querySelectorAll(".step-card-editor").forEach((card, index) => {
+      card.querySelector(".step-card-num").textContent = index + 1;
+    });
+  };
+
+  const createInstructionCard = (text = "") => {
+    const card = document.createElement("div");
+    card.className = "step-card-editor";
+    card.innerHTML = `
+      <div class="step-card-num">1</div>
+      <div class="step-card-body">
+        <textarea class="step-textarea" rows="2" placeholder="Describe this cooking step (e.g. Boil potatoes in salted water until tender)...">${text}</textarea>
+        <div class="step-card-actions">
+          <div class="step-quick-tags">
+            <button type="button" class="step-tag-btn" data-tag="timer">+ ⏱️ 15m Timer</button>
+            <button type="button" class="step-tag-btn" data-tag="tip">+ 💡 Pro Tip</button>
+            <button type="button" class="step-tag-btn" data-tag="bold">Bold</button>
+          </div>
+          <button type="button" class="row-delete-btn step-delete-btn" title="Delete step">✕</button>
+        </div>
+      </div>
+    `;
+
+    const textarea = card.querySelector(".step-textarea");
+    const delBtn = card.querySelector(".step-delete-btn");
+
+    textarea.addEventListener("focus", () => { lastActiveInput = textarea; });
+    textarea.addEventListener("input", syncStepsToTextarea);
+
+    card.querySelectorAll(".step-tag-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const type = btn.dataset.tag;
+        if (type === "timer") {
+          textarea.value += " [timer: 15 mins]";
+        } else if (type === "tip") {
+          textarea.value += " [tip: Secret chef technique]";
+        } else if (type === "bold") {
+          textarea.value += " <b>Important Note</b>";
+        }
+        textarea.focus();
+        syncStepsToTextarea();
+      });
+    });
+
+    delBtn.addEventListener("click", () => {
+      if (stepsCardsList.children.length > 1) {
+        card.remove();
+        recalculateStepNumbers();
+        syncStepsToTextarea();
+      }
+    });
+
+    return card;
+  };
+
+  const syncStepsToTextarea = () => {
+    const steps = [];
+    stepsCardsList.querySelectorAll(".step-card-editor").forEach(card => {
+      const val = card.querySelector(".step-textarea").value.trim();
+      if (val) steps.push(val);
+    });
+    stepsTextarea.value = steps.join("\n");
+  };
+
+  const syncTextareaToSteps = () => {
+    const lines = stepsTextarea.value.split("\n").filter(l => l.trim().length > 0);
+    stepsCardsList.innerHTML = "";
+    if (lines.length === 0) {
+      stepsCardsList.appendChild(createInstructionCard());
+      recalculateStepNumbers();
+      return;
+    }
+
+    lines.forEach(line => {
+      stepsCardsList.appendChild(createInstructionCard(line));
+    });
+    recalculateStepNumbers();
+  };
+
+  addStepBtn.addEventListener("click", () => {
+    const newCard = createInstructionCard();
+    stepsCardsList.appendChild(newCard);
+    recalculateStepNumbers();
+    newCard.querySelector(".step-textarea").focus();
+  });
+
+  // Toggle Steps Mode (Step Cards vs Bulk Text)
+  stepModeCardsBtn.addEventListener("click", () => {
+    stepModeCardsBtn.classList.add("active");
+    stepModeTextBtn.classList.remove("active");
+    syncTextareaToSteps();
+    stepsCardsWrapper.classList.remove("hidden");
+    stepsTextareaWrapper.classList.add("hidden");
+  });
+
+  stepModeTextBtn.addEventListener("click", () => {
+    stepModeTextBtn.classList.add("active");
+    stepModeCardsBtn.classList.remove("active");
+    syncStepsToTextarea();
+    stepsCardsWrapper.classList.add("hidden");
+    stepsTextareaWrapper.classList.remove("hidden");
+  });
+
+  // Toolbar Format buttons for Instructions
+  document.querySelectorAll("[data-step-format]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const fmt = btn.dataset.stepFormat;
+      const target = (lastActiveInput && lastActiveInput.classList.contains("step-textarea"))
+        ? lastActiveInput
+        : stepsCardsList.querySelector(".step-textarea");
+
+      if (!target) return;
+
+      if (fmt === "bold") target.value += " <b>bold step</b>";
+      else if (fmt === "italic") target.value += " <i>italic detail</i>";
+      else if (fmt === "timer") target.value += " [timer: 20 mins]";
+      else if (fmt === "tip") target.value += " [tip: Don't overcrowd the pan for crispiness!]";
+      else if (fmt === "temp") target.value += " [temp: 425°F / 220°C]";
+
+      target.focus();
+      syncStepsToTextarea();
+    });
+  });
+
+  // =========================================================
+  // 3. INITIAL SEED ROWS & CARDS
+  // =========================================================
+
+  const seedIngredients = [
+    { amt: "400g", name: "fettuccine or tagliatelle pasta" },
+    { amt: "2 tbsp", name: "extra virgin olive oil" },
+    { amt: "300g", name: "mixed mushrooms (cremini, shiitake)" },
+    { amt: "3 cloves", name: "garlic, finely minced" },
+    { amt: "1/2 cup", name: "heavy whipping cream" },
+    { amt: "To taste", name: "Fresh thyme leaves, sea salt & cracked black pepper" }
+  ];
+
+  seedIngredients.forEach(item => {
+    ingRowsList.appendChild(createIngredientRow(item.amt, item.name));
+  });
+  syncIngredientsToTextarea();
+
+  const seedSteps = [
+    "Bring a large pot of cold salted water to a rolling boil and cook pasta al dente [timer: 9 mins].",
+    "In a heavy skillet, sear sliced mushrooms in olive oil over high heat until deep golden brown.",
+    "Add minced garlic and fresh thyme leaves; cook for 1 minute until fragrant.",
+    "Pour in heavy cream and gently simmer for 2 minutes to thicken [timer: 2 mins]. [tip: Save 1/2 cup pasta water!]",
+    "Toss pasta directly into the velvety sauce with grated parmesan. Garnish with parsley and serve piping hot."
+  ];
+
+  seedSteps.forEach(step => {
+    stepsCardsList.appendChild(createInstructionCard(step));
+  });
+  recalculateStepNumbers();
+  syncStepsToTextarea();
+
+  // =========================================================
+  // 4. REAL-TIME LIVE PREVIEW
+  // =========================================================
+
   const updateLivePreview = () => {
-    const titleVal = titleInput.value.trim() || "Your Recipe Title Here";
+    const titleVal = titleInput.value.trim() || "Creamy Truffle Wild Mushroom Tagliatelle";
     const catVal = categoryInput.value || "Dinner";
     const diffVal = difficultyInput.value || "Easy";
     const prep = parseInt(prepTimeInput.value, 10) || 15;
     const cook = parseInt(cookTimeInput.value, 10) || 25;
-    const descVal = descInput.value.trim() || "A brief description of your delicious culinary creation will appear here.";
+    const descVal = descInput.value.trim() || "A velvety garlic and herb cream sauce tossed with pan-seared mushrooms and artisan egg pasta.";
     const imgVal = imageInput.value.trim() || defaultSampleImg;
 
     previewTitle.textContent = titleVal;
@@ -47,14 +381,12 @@ document.addEventListener("DOMContentLoaded", () => {
     previewDesc.textContent = descVal;
     previewTotalTime.textContent = `${prep + cook} mins total`;
 
-    // Try setting image with error fallback
     const tempImg = new Image();
     tempImg.onload = () => { previewImg.src = imgVal; };
     tempImg.onerror = () => { previewImg.src = defaultSampleImg; };
     tempImg.src = imgVal;
   };
 
-  // Bind Input Listeners for Live Preview
   [titleInput, categoryInput, difficultyInput, prepTimeInput, cookTimeInput, descInput, imageInput].forEach(el => {
     el.addEventListener("input", updateLivePreview);
     el.addEventListener("change", updateLivePreview);
@@ -76,9 +408,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (countEl) countEl.textContent = count;
   } catch (e) {}
 
-  // Form Submit Handler
+  // =========================================================
+  // 5. FORM SUBMISSION & LOCALSTORAGE PERSISTENCE
+  // =========================================================
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+
+    syncIngredientsToTextarea();
+    syncStepsToTextarea();
 
     const title = titleInput.value.trim();
     const category = categoryInput.value;
@@ -88,8 +426,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const servings = parseInt(servingsInput.value, 10) || 4;
     const imageUrl = imageInput.value.trim() || defaultSampleImg;
     const description = descInput.value.trim();
-    const rawIngredients = ingredientsInput.value.trim();
-    const rawInstructions = instructionsInput.value.trim();
+    const rawIngredients = ingTextarea.value.trim();
+    const rawInstructions = stepsTextarea.value.trim();
     const author = authorNameInput.value.trim() || "You (Chef)";
     const authorRole = authorRoleInput.value.trim() || "Home Chef";
 
@@ -122,17 +460,17 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Failed to save recipe", err);
     }
 
-    // Show toast and redirect to the newly created recipe details page
+    // Show toast and redirect
     const toast = document.createElement("div");
     toast.className = "toast";
     toast.innerHTML = `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      <span>Recipe published! Opening details page...</span>
+      <span>Recipe published! Opening your delicious recipe...</span>
     `;
     document.getElementById("toastContainer").appendChild(toast);
 
     setTimeout(() => {
       window.location.href = `./recipe-detail.html?id=${encodeURIComponent(newRecipe.id)}`;
-    }, 900);
+    }, 800);
   });
 });

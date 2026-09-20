@@ -162,21 +162,90 @@
             </div>
           </div>
 
-          <!-- Section 3: Ingredients & Directions -->
+          <!-- Section 3: Ingredients & Directions (Upgraded with Rich Formatting & Dynamic Builders) -->
           <div class="form-section-card">
             <h3 class="form-section-heading">3. Ingredients & Instructions</h3>
-            
-            <div class="form-group">
-              <label for="recipeIngredientsInput">Ingredients Checklist (one per line) *</label>
-              <textarea id="recipeIngredientsInput" rows="5" placeholder="400g fettuccine or tagliatelle&#10;2 tbsp extra virgin olive oil&#10;300g mixed mushrooms (cremini, shiitake)&#10;3 cloves garlic, finely minced&#10;1/2 cup heavy cream or crème fraîche&#10;Fresh thyme leaves, grated parmesan & black pepper" required></textarea>
-              <small class="hint-text">Type each ingredient on a new line. They will automatically render as interactive checklist items.</small>
+
+            <!-- 3A. INGREDIENTS BUILDER -->
+            <div class="builder-block">
+              <div class="builder-header">
+                <label class="builder-title">Ingredients Checklist *</label>
+                <div class="builder-toggle-group">
+                  <button type="button" class="builder-toggle-btn active" id="ingModeRowsBtn">Row Builder</button>
+                  <button type="button" class="builder-toggle-btn" id="ingModeTextBtn">Bulk Text</button>
+                </div>
+              </div>
+
+              <!-- Ingredients Formatting Toolbar -->
+              <div class="editor-toolbar">
+                <span class="toolbar-label">Format:</span>
+                <button type="button" class="toolbar-btn" data-tag="bold" title="Make text bold"><b>B</b></button>
+                <button type="button" class="toolbar-btn" data-tag="italic" title="Make text italic"><i>I</i></button>
+                <button type="button" class="toolbar-btn" data-tag="header" title="Add Section Header (e.g. [For Sauce])">+ Section [Header]</button>
+                <div class="toolbar-divider"></div>
+                <span class="toolbar-label">Quick Add:</span>
+                <button type="button" class="quick-pantry-chip" data-text="Salt & cracked black pepper to taste">+ Salt & Pepper</button>
+                <button type="button" class="quick-pantry-chip" data-text="2 tbsp extra virgin olive oil">+ Olive Oil</button>
+                <button type="button" class="quick-pantry-chip" data-text="3 cloves garlic, minced">+ Garlic</button>
+                <button type="button" class="quick-pantry-chip" data-text="2 tbsp unsalted butter">+ Butter</button>
+              </div>
+
+              <!-- Interactive Dynamic Rows Container -->
+              <div id="ingredientsRowsWrapper" class="ingredients-rows-container">
+                <div id="ingredientsRowsList" class="rows-list">
+                  <!-- Injected via JavaScript with Amount + Name + Delete -->
+                </div>
+                <button type="button" class="btn btn-outline btn-add-row" id="addIngredientRowBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Add Next Ingredient</span>
+                </button>
+              </div>
+
+              <!-- Fallback/Bulk Textarea Mode (Hidden by default, syncs with rows) -->
+              <div id="ingredientsTextareaWrapper" class="textarea-mode-wrapper hidden">
+                <textarea id="recipeIngredientsInput" rows="6" placeholder="400g fettuccine pasta&#10;2 tbsp extra virgin olive oil&#10;300g sliced mushrooms&#10;3 cloves garlic, minced"></textarea>
+                <small class="hint-text">Type or paste ingredients line by line. Supports &lt;b&gt;bold&lt;/b&gt; and [Section Headers].</small>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="recipeInstructionsInput">Step-by-Step Cooking Instructions (one per line) *</label>
-              <textarea id="recipeInstructionsInput" rows="5" placeholder="Bring a large pot of salted water to a rolling boil and cook pasta al dente.&#10;In a heavy skillet, sear sliced mushrooms in olive oil over high heat until golden brown.&#10;Add minced garlic and fresh thyme; cook for 1 minute until aromatic.&#10;Pour in heavy cream and gently simmer for 2 minutes to thicken.&#10;Toss pasta directly into the sauce with a splash of starchy pasta water and parmesan. Serve piping hot." required></textarea>
-              <small class="hint-text">Each line will become a numbered instruction step with a built-in cook timer.</small>
+            <!-- 3B. INSTRUCTIONS BUILDER -->
+            <div class="builder-block" style="margin-top: 24px;">
+              <div class="builder-header">
+                <label class="builder-title">Step-by-Step Instructions *</label>
+                <div class="builder-toggle-group">
+                  <button type="button" class="builder-toggle-btn active" id="stepModeCardsBtn">Step Cards</button>
+                  <button type="button" class="builder-toggle-btn" id="stepModeTextBtn">Bulk Text</button>
+                </div>
+              </div>
+
+              <!-- Instructions Formatting Toolbar -->
+              <div class="editor-toolbar">
+                <span class="toolbar-label">Format:</span>
+                <button type="button" class="toolbar-btn" data-step-format="bold" title="Insert bold text"><b>B</b> Bold</button>
+                <button type="button" class="toolbar-btn" data-step-format="italic" title="Insert italic text"><i>I</i> Italic</button>
+                <button type="button" class="toolbar-btn" data-step-format="timer" title="Add interactive timer tag">⏱️ [timer: 15 mins]</button>
+                <button type="button" class="toolbar-btn" data-step-format="tip" title="Add Chef Pro Tip highlight">💡 [tip: Secret advice]</button>
+                <button type="button" class="toolbar-btn" data-step-format="temp" title="Add cooking temperature">🔥 [425°F / 220°C]</button>
+              </div>
+
+              <!-- Interactive Step Cards Container -->
+              <div id="instructionsCardsWrapper" class="instructions-cards-container">
+                <div id="instructionsCardsList" class="step-cards-list">
+                  <!-- Injected via JavaScript with Step numbers, textareas, and timer buttons -->
+                </div>
+                <button type="button" class="btn btn-outline btn-add-row" id="addInstructionStepBtn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  <span>Add Next Cooking Step</span>
+                </button>
+              </div>
+
+              <!-- Fallback/Bulk Textarea Mode (Hidden by default, syncs with cards) -->
+              <div id="instructionsTextareaWrapper" class="textarea-mode-wrapper hidden">
+                <textarea id="recipeInstructionsInput" rows="6" placeholder="Boil potatoes in salted water until fork-tender [timer: 15 mins].&#10;Gently smash each potato flat with the bottom of a glass.&#10;Brush with melted garlic herb butter and roast until crispy [timer: 30 mins]."></textarea>
+                <small class="hint-text">Each line will become a step. Supports [timer: X mins] tags which turn into live countdown buttons!</small>
+              </div>
             </div>
+
           </div>
 
           <!-- Section 4: Author Profile -->

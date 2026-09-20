@@ -11,7 +11,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=2.2">
+  <style>
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .modal-backdrop.active {
+      display: flex !important;
+    }
+  </style>
 </head>
 <body class="auth-body">
 
@@ -153,7 +174,7 @@
               <input type="checkbox" id="rememberMe" checked>
               <span>Remember me</span>
             </label>
-            <a href="#" class="auth-forgot-link" id="forgotPasswordBtn">Forgot password?</a>
+            <a href="#" class="auth-forgot-link" id="forgotPasswordBtn" onclick="if(window.authManagerInstance) { window.authManagerInstance.openForgotModal(); } return false;">Forgot password?</a>
           </div>
 
           <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
@@ -437,7 +458,7 @@
 
   <div id="toastContainer" class="toast-container"></div>
 
-  <script src="./config.js?v=2.1"></script>
-  <script src="./auth.js?v=2.1"></script>
+  <script src="./config.js?v=2.2"></script>
+  <script src="./auth.js?v=2.2"></script>
 </body>
 </html>

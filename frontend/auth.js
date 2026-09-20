@@ -15,6 +15,7 @@ class AuthManager {
     this.bindEvents();
     this.checkUrlMode();
     this.checkExistingSession();
+    window.authManagerInstance = this;
   }
 
   cacheDom() {
@@ -442,11 +443,13 @@ class AuthManager {
     }
 
     this.forgotModal.classList.add("active");
+    this.forgotModal.style.display = "flex";
   }
 
   closeForgotModal() {
     if (!this.forgotModal) return;
     this.forgotModal.classList.remove("active");
+    this.forgotModal.style.display = "none";
     if (this.forgotState.timerInterval) {
       clearInterval(this.forgotState.timerInterval);
       this.forgotState.timerInterval = null;

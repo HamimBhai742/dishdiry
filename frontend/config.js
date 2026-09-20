@@ -23,7 +23,13 @@
   );
 
   // Allow manual override from localStorage if desired
-  const manualOverride = localStorage.getItem("dishdiary_api_url");
+  let manualOverride = localStorage.getItem("dishdiary_api_url");
+
+  // Automatically clear old insecure IP overrides from previous sessions
+  if (manualOverride && (manualOverride.includes("92.112.192.226") || (!isLocalHost && manualOverride.startsWith("http://")))) {
+    localStorage.removeItem("dishdiary_api_url");
+    manualOverride = null;
+  }
 
   // Determine active API base URL
   let resolvedApi = manualOverride;

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chef Profile — DishDiary</title>
+  <meta name="description" content="View your published recipes, saved culinary bookmarks, and chef profile details on DishDiary.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍳</text></svg>">
+
+  <!-- Google Fonts: Editorial Serif + Modern Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Shared Stylesheet -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="navbar-wrapper">
+    <div class="navbar container">
+      <!-- Logo -->
+      <a href="./index.html" class="brand-logo" id="brandLogo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+        </div>
+        <span class="logo-text">Dish<strong>Diary</strong></span>
+      </a>
+
+      <!-- Desktop Links -->
+      <nav class="nav-links">
+        <a href="./index.html#home" class="nav-link">Home</a>
+        <a href="./index.html#explore" class="nav-link">Explore</a>
+        <a href="./index.html#recipes" class="nav-link">Recipes</a>
+        <a href="./index.html#saved" class="nav-link">Saved (<span id="savedCount">0</span>)</a>
+        <a href="./index.html#community" class="nav-link">Community</a>
+      </nav>
+
+      <!-- Right Actions -->
+      <div class="nav-actions">
+        <a href="./add-recipe.html" class="btn btn-primary" id="navAddRecipeBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Add Recipe</span>
+        </a>
+        <div id="navUserSlot">
+          <button class="btn btn-outline" id="signInBtn">Sign In</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Profile Page Main Content -->
+  <main class="profile-page-wrapper">
+    <div class="container">
+
+      <!-- Breadcrumb -->
+      <nav class="profile-breadcrumb">
+        <a href="./index.html">Home</a>
+        <span>/</span>
+        <span style="color: var(--text-main); font-weight: 600;">Chef Profile</span>
+      </nav>
+
+      <!-- Chef Hero Profile Card -->
+      <section class="profile-header-card">
+        <div class="profile-user-left">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar-initials" id="profileAvatarInitials">C</div>
+            <img src="" class="profile-avatar-img" id="profileAvatarImg" alt="Chef Avatar" style="display: none;">
+            <div class="profile-verified-badge" title="Verified Chef">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="profile-user-info">
+            <div class="profile-name-row">
+              <h1 class="profile-name" id="profileDisplayName">Chef</h1>
+              <span class="profile-role-pill" id="profileRolePill">Verified Chef</span>
+            </div>
+            <p class="profile-tagline" id="profileBioText">Passionate Home Cook & Culinary Recipe Creator</p>
+            <div class="profile-meta-tags">
+              <span class="profile-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span id="profileEmailText">chef@dishdiary.com</span>
+              </span>
+              <span class="profile-meta-item">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span id="profileJoinDateText">Member since 2026</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-header-actions">
+          <button type="button" class="btn btn-outline" id="openEditProfileBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+            <span>Edit Profile</span>
+          </button>
+          <a href="./add-recipe.html" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>New Recipe</span>
+          </a>
+          <button type="button" class="btn btn-outline" id="profileLogoutBtn" style="color: #dc2626; border-color: #fecaca;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Stats Overview Row -->
+      <section class="profile-stats-grid">
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon-wrap orange">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          </div>
+          <div>
+            <div class="profile-stat-value" id="statMyRecipesCount">0</div>
+            <div class="profile-stat-label">Published Recipes</div>
+          </div>
+        </div>
+
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon-wrap amber">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          </div>
+          <div>
+            <div class="profile-stat-value" id="statSavedCount">0</div>
+            <div class="profile-stat-label">Saved Bookmarks</div>
+          </div>
+        </div>
+
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon-wrap emerald">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          </div>
+          <div>
+            <div class="profile-stat-value">4.9 ★</div>
+            <div class="profile-stat-label">Chef Rating</div>
+          </div>
+        </div>
+
+        <div class="profile-stat-card">
+          <div class="profile-stat-icon-wrap blue">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <div>
+            <div class="profile-stat-value" id="statCookTimeHours">1.5h</div>
+            <div class="profile-stat-label">Avg Cook Time</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab Navigation -->
+      <div class="profile-tabs-nav">
+        <button type="button" class="profile-tab-btn active" data-tab="myRecipes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span>My Published Recipes</span>
+          <span class="profile-tab-badge" id="tabMyRecipesBadge">0</span>
+        </button>
+        <button type="button" class="profile-tab-btn" data-tab="savedDishes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+          <span>Saved Dishes</span>
+          <span class="profile-tab-badge" id="tabSavedBadge">0</span>
+        </button>
+        <button type="button" class="profile-tab-btn" data-tab="accountDetails">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Account & Profile Details</span>
+        </button>
+      </div>
+
+      <!-- Tab Panel 1: My Published Recipes -->
+      <section class="profile-tab-panel active" id="panelMyRecipes">
+        <div class="profile-recipes-grid" id="myRecipesGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+        <div class="profile-empty-state" id="myRecipesEmptyState" style="display: none;">
+          <span class="profile-empty-icon">🍳</span>
+          <h3 class="profile-empty-title">No Recipes Published Yet</h3>
+          <p class="profile-empty-desc">Share your culinary creations with food lovers worldwide. Create your first recipe now!</p>
+          <a href="./add-recipe.html" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Create Your First Recipe</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Tab Panel 2: Saved Dishes -->
+      <section class="profile-tab-panel" id="panelSavedDishes">
+        <div class="profile-recipes-grid" id="savedDishesGrid">
+          <!-- Injected via JavaScript -->
+        </div>
+        <div class="profile-empty-state" id="savedDishesEmptyState" style="display: none;">
+          <span class="profile-empty-icon">🔖</span>
+          <h3 class="profile-empty-title">No Saved Dishes</h3>
+          <p class="profile-empty-desc">Bookmark your favorite recipes from the feed to quickly cook them later.</p>
+          <a href="./index.html#recipes" class="btn btn-primary">
+            <span>Explore Delicious Recipes</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Tab Panel 3: Account & Profile Details -->
+      <section class="profile-tab-panel" id="panelAccountDetails">
+        <div class="profile-account-card">
+          <h2 class="profile-account-title">Chef Account Information</h2>
+          <div class="profile-details-table">
+            <span class="profile-details-label">Full Name</span>
+            <span class="profile-details-val" id="detailFullName">Chef</span>
+
+            <span class="profile-details-label">Email Address</span>
+            <span class="profile-details-val" id="detailEmail">chef@dishdiary.com</span>
+
+            <span class="profile-details-label">Culinary Role</span>
+            <span class="profile-details-val" id="detailRole">Verified Chef</span>
+
+            <span class="profile-details-label">Bio & Tagline</span>
+            <span class="profile-details-val" id="detailBio">Passionate Home Cook & Culinary Creator</span>
+
+            <span class="profile-details-label">Account Status</span>
+            <span class="profile-details-val" style="color: #059669; display: inline-flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+              Active & Verified
+            </span>
+
+            <span class="profile-details-label">Database ID</span>
+            <span class="profile-details-val" id="detailUserId" style="font-family: monospace; font-size: 0.85rem; color: #64748b;">Loading...</span>
+
+            <span class="profile-details-label">Registration Date</span>
+            <span class="profile-details-val" id="detailCreatedAt">September 2026</span>
+
+            <span class="profile-details-label">Cloud Storage</span>
+            <span class="profile-details-val" style="color: var(--primary);">Cloudinary Media CDN Active</span>
+          </div>
+
+          <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid #f1f5f9; display: flex; gap: 12px;">
+            <button type="button" class="btn btn-primary" id="detailEditProfileBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <span>Edit Account Details</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Edit Profile Modal -->
+  <div class="profile-modal-backdrop" id="editProfileModal">
+    <div class="profile-modal-card">
+      <div class="profile-modal-header">
+        <h2 class="profile-modal-title">Edit Chef Profile</h2>
+        <button type="button" class="profile-modal-close" id="closeEditProfileBtn">&times;</button>
+      </div>
+
+      <form id="editProfileForm">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="editNameInput" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">Full Name</label>
+          <input type="text" id="editNameInput" class="form-control" required style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="editRoleInput" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">Role / Title</label>
+          <input type="text" id="editRoleInput" class="form-control" placeholder="e.g. Master Baker, Executive Chef" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label for="editBioInput" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">Bio / Tagline</label>
+          <textarea id="editBioInput" rows="3" class="form-control" placeholder="Tell food lovers about your culinary passion..." style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem; font-family: inherit; resize: vertical;"></textarea>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+          <label for="editAvatarInput" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px;">Avatar Image URL (optional)</label>
+          <input type="url" id="editAvatarInput" class="form-control" placeholder="https://..." style="width: 100%; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.95rem;">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" class="btn btn-outline" id="cancelEditProfileBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+            <span>Save Profile</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Recipe Confirmation Modal -->
+  <div class="profile-modal-backdrop" id="deleteRecipeModal">
+    <div class="profile-modal-card" style="max-width: 440px; text-align: center;">
+      <div style="width: 52px; height: 52px; background: #fee2e2; color: #dc2626; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </div>
+      <h2 style="font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 8px;">Delete this Recipe?</h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 24px; line-height: 1.5;">This recipe will be permanently removed from your profile and database. This action cannot be undone.</p>
+      <div style="display: flex; justify-content: center; gap: 12px;">
+        <button type="button" class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmDeleteBtn" style="background: #dc2626; border-color: #dc2626;">
+          <span>Delete Recipe</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom">
+      <p>© 2026 DishDiary. Discover, Cook & Share Wonderful Recipes.</p>
+    </div>
+  </footer>
+
+  <!-- Profile Page Logic -->
+  <script src="./profile.js"></script>
+</body>
+</html>

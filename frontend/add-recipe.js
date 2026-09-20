@@ -409,6 +409,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const uploadText = document.getElementById("uploadStatusText");
   const uploadSpinner = document.getElementById("uploadSpinner");
   const uploadClearBtn = document.getElementById("uploadClearBtn");
+  let currentUploadedPublicId = null;
+  let currentUploadedUrl = null;
 
   const uploadFileToBackend = async (file) => {
     if (!file || !file.type.startsWith("image/")) {
@@ -419,6 +421,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (file.size > 10 * 1024 * 1024) {
       alert("Image size should be under 10MB.");
       return;
+    }
+
+    // Delete previously uploaded draft image from Cloudinary if replacing
+    if (currentUploadedPublicId || (currentUploadedUrl && (currentUploadedUrl.includes("res.cloudinary.com") || currentUploadedUrl.includes("/uploads/")))) {
+      const oldPublicId = currentUploadedPublicId;
+      const oldUrl = currentUploadedUrl;
+      fetch("http://localhost:5000/api/v1/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ public_id: oldPublicId, url: oldUrl }),
+      }).catch(() => {});
     }
 
     // Show uploading state
@@ -448,6 +461,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const json = await res.json();
       if (res.ok && json.success && json.data?.url) {
         const uploadedUrl = json.data.url;
+        currentUploadedUrl = uploadedUrl;
+        currentUploadedPublicId = json.data.public_id || null;
         imageInput.value = uploadedUrl;
         updateLivePreview();
 
@@ -519,12 +534,53 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (uploadClearBtn) {
-    uploadClearBtn.addEventListener("click", (e) => {
+    uploadClearBtn.addEventListener("click", async (e) => {
       e.stopPropagation();
+
+      const publicIdToDelete = currentUploadedPublicId;
+      const urlToDelete = currentUploadedUrl || imageInput.value;
+
+      // Reset frontend values
       imageInput.value = "";
       fileInput.value = "";
-      if (uploadStatus) uploadStatus.style.display = "none";
+      currentUploadedPublicId = null;
+      currentUploadedUrl = null;
       updateLivePreview();
+
+      const originalBtnHtml = uploadClearBtn.innerHTML;
+      uploadClearBtn.disabled = true;
+      uploadClearBtn.innerHTML = "<span>Deleting...</span>";
+
+      // If there's an image uploaded to Cloudinary or local storage, send delete request
+      if (publicIdToDelete || (urlToDelete && (urlToDelete.includes("res.cloudinary.com") || urlToDelete.includes("/uploads/")))) {
+        try {
+          if (uploadText) uploadText.textContent = "Deleting image from Cloudinary...";
+          await fetch("http://localhost:5000/api/v1/upload", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              public_id: publicIdToDelete,
+              url: urlToDelete,
+            }),
+          });
+
+          // Show deletion notification toast
+          const toast = document.createElement("div");
+          toast.className = "toast";
+          toast.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            <span>Photo deleted from Cloudinary!</span>
+          `;
+          document.getElementById("toastContainer")?.appendChild(toast);
+          setTimeout(() => toast.remove(), 3500);
+        } catch (err) {
+          console.warn("[Upload] Failed to delete from backend:", err);
+        }
+      }
+
+      uploadClearBtn.disabled = false;
+      uploadClearBtn.innerHTML = originalBtnHtml;
+      if (uploadStatus) uploadStatus.style.display = "none";
     });
   }
 
@@ -555,124 +611,161 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    syncIngredientsToTextarea();
-    syncStepsToTextarea();
+    const publishBtn = document.getElementById("publishBtn");
+    const originalPublishBtnHtml = publishBtn ? publishBtn.innerHTML : "";
 
-    const title = titleInput.value.trim();
-    const category = categoryInput.value;
-    const difficulty = difficultyInput.value;
-    const prepTime = parseInt(prepTimeInput.value, 10) || 15;
-    const cookTime = parseInt(cookTimeInput.value, 10) || 20;
-    const servings = parseInt(servingsInput.value, 10) || 4;
-    const imageUrl = imageInput.value.trim() || defaultSampleImg;
-    const description = descInput.value.trim();
-    const rawIngredients = ingTextarea.value.trim();
-    const rawInstructions = stepsTextarea.value.trim();
-    const userJson = localStorage.getItem("dishdiary_user");
-    let currentUser = null;
-    try {
-      currentUser = userJson ? JSON.parse(userJson) : null;
-    } catch (e) {}
-
-    const author = (currentUser && currentUser.name)
-      ? currentUser.name
-      : (authorNameInput.value.trim() || "You (Chef)");
-    const authorRole = authorRoleInput.value.trim() || "Home Chef";
-
-    const newRecipe = {
-      id: "dish-custom-" + Date.now(),
-      title,
-      category,
-      difficulty,
-      prepTime,
-      cookTime,
-      servings,
-      rating: 5.0,
-      reviewsCount: 1,
-      author,
-      authorEmail: currentUser ? currentUser.email : "",
-      userId: currentUser ? currentUser.id : "",
-      authorRole,
-      authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80",
-      image: imageUrl,
-      description,
-      ingredients: rawIngredients.split("\n").filter(l => l.trim().length > 0),
-      instructions: rawInstructions.split("\n").filter(l => l.trim().length > 0)
+    const resetPublishBtn = () => {
+      if (publishBtn) {
+        publishBtn.disabled = false;
+        publishBtn.classList.remove("disabled");
+        publishBtn.innerHTML = originalPublishBtnHtml;
+      }
     };
 
-    // Attempt to persist to MongoDB Atlas backend API
+    const title = titleInput.value.trim();
+    if (!title) {
+      alert("Please enter a recipe title.");
+      titleInput.focus();
+      return;
+    }
+
+    // Disable button & show loading spinner
+    if (publishBtn) {
+      publishBtn.disabled = true;
+      publishBtn.classList.add("disabled");
+      publishBtn.innerHTML = `
+        <span class="btn-spinner"></span>
+        <span>Publishing Recipe...</span>
+      `;
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/api/v1/recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: newRecipe.title,
-          category: newRecipe.category,
-          difficulty: newRecipe.difficulty,
-          prepTime: newRecipe.prepTime,
-          cookTime: newRecipe.cookTime,
-          servings: newRecipe.servings,
-          rating: newRecipe.rating,
-          reviewsCount: newRecipe.reviewsCount,
-          author: newRecipe.author,
-          authorRole: newRecipe.authorRole,
-          authorAvatar: newRecipe.authorAvatar,
-          image: newRecipe.image,
-          description: newRecipe.description,
-          ingredients: newRecipe.ingredients,
-          instructions: newRecipe.instructions,
-        })
-      });
+      syncIngredientsToTextarea();
+      syncStepsToTextarea();
 
-      if (res.ok) {
-        const json = await res.json();
-        if (json.data && (json.data.id || json.data._id)) {
-          const apiId = json.data.id || json.data._id;
-          newRecipe.id = apiId;
-          console.log("[DishDiary] Successfully saved recipe to MongoDB Atlas:", apiId);
+      const category = categoryInput.value;
+      const difficulty = difficultyInput.value;
+      const prepTime = parseInt(prepTimeInput.value, 10) || 15;
+      const cookTime = parseInt(cookTimeInput.value, 10) || 20;
+      const servings = parseInt(servingsInput.value, 10) || 4;
+      const imageUrl = imageInput.value.trim() || defaultSampleImg;
+      const description = descInput.value.trim();
+      const rawIngredients = ingTextarea.value.trim();
+      const rawInstructions = stepsTextarea.value.trim();
+      const userJson = localStorage.getItem("dishdiary_user");
+      let currentUser = null;
+      try {
+        currentUser = userJson ? JSON.parse(userJson) : null;
+      } catch (e) {}
 
-          // Track in my_recipe_ids
-          try {
-            const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]");
-            if (!myIds.includes(apiId)) {
-              myIds.unshift(apiId);
-              localStorage.setItem("dishdiary_my_recipe_ids", JSON.stringify(myIds));
-            }
-          } catch (idErr) {}
+      const author = (currentUser && currentUser.name)
+        ? currentUser.name
+        : (authorNameInput.value.trim() || "You (Chef)");
+      const authorRole = authorRoleInput.value.trim() || "Home Chef";
+
+      const newRecipe = {
+        id: "dish-custom-" + Date.now(),
+        title,
+        category,
+        difficulty,
+        prepTime,
+        cookTime,
+        servings,
+        rating: 5.0,
+        reviewsCount: 1,
+        author,
+        authorEmail: currentUser ? currentUser.email : "",
+        userId: currentUser ? currentUser.id : "",
+        authorRole,
+        authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80",
+        image: imageUrl,
+        description,
+        ingredients: rawIngredients.split("\n").filter(l => l.trim().length > 0),
+        instructions: rawInstructions.split("\n").filter(l => l.trim().length > 0)
+      };
+
+      // Attempt to persist to MongoDB Atlas backend API
+      try {
+        const res = await fetch("http://localhost:5000/api/v1/recipes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: newRecipe.title,
+            category: newRecipe.category,
+            difficulty: newRecipe.difficulty,
+            prepTime: newRecipe.prepTime,
+            cookTime: newRecipe.cookTime,
+            servings: newRecipe.servings,
+            rating: newRecipe.rating,
+            reviewsCount: newRecipe.reviewsCount,
+            author: newRecipe.author,
+            authorRole: newRecipe.authorRole,
+            authorAvatar: newRecipe.authorAvatar,
+            image: newRecipe.image,
+            description: newRecipe.description,
+            ingredients: newRecipe.ingredients,
+            instructions: newRecipe.instructions,
+          })
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && (json.data.id || json.data._id)) {
+            const apiId = json.data.id || json.data._id;
+            newRecipe.id = apiId;
+            console.log("[DishDiary] Successfully saved recipe to MongoDB Atlas:", apiId);
+
+            // Track in my_recipe_ids
+            try {
+              const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]");
+              if (!myIds.includes(apiId)) {
+                myIds.unshift(apiId);
+                localStorage.setItem("dishdiary_my_recipe_ids", JSON.stringify(myIds));
+              }
+            } catch (idErr) {}
+          }
         }
+      } catch (apiErr) {
+        console.log("[DishDiary] Backend API offline; saved locally to localStorage fallback");
       }
-    } catch (apiErr) {
-      console.log("[DishDiary] Backend API offline; saved locally to localStorage fallback");
-    }
 
-    // Save to LocalStorage cache
-    try {
-      const stored = localStorage.getItem("dishdiary_custom_recipes");
-      const list = stored ? JSON.parse(stored) : [];
-      list.unshift(newRecipe);
-      localStorage.setItem("dishdiary_custom_recipes", JSON.stringify(list));
+      // Clear draft image tracking so it won't be deleted on unmount
+      currentUploadedPublicId = null;
+      currentUploadedUrl = null;
 
-      // Track in my_recipe_ids
-      const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]");
-      if (!myIds.includes(newRecipe.id)) {
-        myIds.unshift(newRecipe.id);
-        localStorage.setItem("dishdiary_my_recipe_ids", JSON.stringify(myIds));
+      // Save to LocalStorage cache
+      try {
+        const stored = localStorage.getItem("dishdiary_custom_recipes");
+        const list = stored ? JSON.parse(stored) : [];
+        list.unshift(newRecipe);
+        localStorage.setItem("dishdiary_custom_recipes", JSON.stringify(list));
+
+        // Track in my_recipe_ids
+        const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]");
+        if (!myIds.includes(newRecipe.id)) {
+          myIds.unshift(newRecipe.id);
+          localStorage.setItem("dishdiary_my_recipe_ids", JSON.stringify(myIds));
+        }
+      } catch (err) {
+        console.error("Failed to save recipe locally", err);
       }
+
+      // Show toast and redirect
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>Recipe published! Opening your delicious recipe...</span>
+      `;
+      document.getElementById("toastContainer").appendChild(toast);
+
+      setTimeout(() => {
+        window.location.href = `./recipe-detail.html?id=${encodeURIComponent(newRecipe.id)}`;
+      }, 700);
     } catch (err) {
-      console.error("Failed to save recipe locally", err);
+      console.error("Failed to submit recipe", err);
+      alert("Something went wrong while publishing the recipe. Please try again.");
+      resetPublishBtn();
     }
-
-    // Show toast and redirect
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.innerHTML = `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      <span>Recipe published to database! Opening your delicious recipe...</span>
-    `;
-    document.getElementById("toastContainer").appendChild(toast);
-
-    setTimeout(() => {
-      window.location.href = `./recipe-detail.html?id=${encodeURIComponent(newRecipe.id)}`;
-    }, 800);
   });
 });

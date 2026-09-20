@@ -12,7 +12,7 @@
 
 (function () {
   const LOCAL_API = "http://localhost:5942/api/v1";
-  const PROD_API = "http://92.112.192.226:5942/api/v1";
+  const PROD_API = "https://api-dishdiary.hamim.dpdns.org/api/v1";
 
   // Check if current browser hostname is local
   const isLocalHost = Boolean(

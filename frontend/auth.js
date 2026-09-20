@@ -43,6 +43,7 @@ class AuthManager {
     this.googleBtn = document.getElementById("googleAuthBtn");
     this.appleBtn = document.getElementById("appleAuthBtn");
     this.forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+    this.cacheForgotDom();
   }
 
   bindEvents() {
@@ -87,9 +88,11 @@ class AuthManager {
     if (this.forgotPasswordBtn) {
       this.forgotPasswordBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        this.showAlert("info", "Please contact support@dishdiary.com to reset your chef password.");
+        this.openForgotModal();
       });
     }
+
+    this.bindForgotEvents();
   }
 
   checkUrlMode() {
@@ -328,6 +331,346 @@ class AuthManager {
     `;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+  }
+
+  // =========================================================
+  // FORGOT PASSWORD FLOW DOM & EVENTS
+  // =========================================================
+  cacheForgotDom() {
+    this.forgotModal = document.getElementById("forgotPasswordModal");
+    this.closeForgotModalBtn = document.getElementById("closeForgotModalBtn");
+    this.forgotModalAlert = document.getElementById("forgotModalAlert");
+
+    // Steps
+    this.stepEmail = document.getElementById("forgotStepEmail");
+    this.stepOtp = document.getElementById("forgotStepOtp");
+    this.stepReset = document.getElementById("forgotStepReset");
+    this.stepSuccess = document.getElementById("forgotStepSuccess");
+
+    // Form 1 - Request OTP
+    this.forgotEmailForm = document.getElementById("forgotEmailForm");
+    this.forgotEmailInput = document.getElementById("forgotEmailInput");
+    this.sendOtpBtn = document.getElementById("sendOtpBtn");
+
+    // Form 2 - Verify OTP
+    this.verifyOtpForm = document.getElementById("verifyOtpForm");
+    this.otpCodeInput = document.getElementById("otpCodeInput");
+    this.verifyOtpBtn = document.getElementById("verifyOtpBtn");
+    this.displayTargetEmail = document.getElementById("displayTargetEmail");
+    this.otpTimerDisplay = document.getElementById("otpTimerDisplay");
+    this.resendOtpBtn = document.getElementById("resendOtpBtn");
+    this.backToEmailStepBtn = document.getElementById("backToEmailStepBtn");
+
+    // Form 3 - Reset Password
+    this.newPasswordForm = document.getElementById("newPasswordForm");
+    this.newPasswordInput = document.getElementById("newPasswordInput");
+    this.confirmPasswordInput = document.getElementById("confirmPasswordInput");
+    this.resetPasswordBtn = document.getElementById("resetPasswordBtn");
+
+    // Step 4 - Finish
+    this.finishResetBtn = document.getElementById("finishResetBtn");
+
+    // State
+    this.forgotState = {
+      email: "",
+      otp: "",
+      timerInterval: null,
+    };
+  }
+
+  bindForgotEvents() {
+    if (this.closeForgotModalBtn) {
+      this.closeForgotModalBtn.addEventListener("click", () => this.closeForgotModal());
+    }
+
+    if (this.forgotModal) {
+      this.forgotModal.addEventListener("click", (e) => {
+        if (e.target === this.forgotModal) this.closeForgotModal();
+      });
+    }
+
+    if (this.forgotEmailForm) {
+      this.forgotEmailForm.addEventListener("submit", (e) => this.handleForgotEmailSubmit(e));
+    }
+
+    if (this.verifyOtpForm) {
+      this.verifyOtpForm.addEventListener("submit", (e) => this.handleVerifyOtpSubmit(e));
+    }
+
+    if (this.resendOtpBtn) {
+      this.resendOtpBtn.addEventListener("click", () => this.handleResendOtp());
+    }
+
+    if (this.backToEmailStepBtn) {
+      this.backToEmailStepBtn.addEventListener("click", () => this.showForgotStep("email"));
+    }
+
+    if (this.newPasswordForm) {
+      this.newPasswordForm.addEventListener("submit", (e) => this.handleResetPasswordSubmit(e));
+    }
+
+    if (this.finishResetBtn) {
+      this.finishResetBtn.addEventListener("click", () => {
+        this.closeForgotModal();
+        this.setMode("signin");
+        if (this.forgotState.email && this.loginEmail) {
+          this.loginEmail.value = this.forgotState.email;
+        }
+        if (this.loginPassword) {
+          this.loginPassword.value = "";
+          this.loginPassword.focus();
+        }
+      });
+    }
+
+    // Sanitize OTP input to digits only
+    if (this.otpCodeInput) {
+      this.otpCodeInput.addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
+      });
+    }
+  }
+
+  openForgotModal() {
+    if (!this.forgotModal) return;
+    this.hideForgotAlert();
+    this.showForgotStep("email");
+
+    // Prefill email if already typed in sign in
+    if (this.loginEmail && this.loginEmail.value.trim() && this.forgotEmailInput) {
+      this.forgotEmailInput.value = this.loginEmail.value.trim();
+    }
+
+    this.forgotModal.classList.add("active");
+  }
+
+  closeForgotModal() {
+    if (!this.forgotModal) return;
+    this.forgotModal.classList.remove("active");
+    if (this.forgotState.timerInterval) {
+      clearInterval(this.forgotState.timerInterval);
+      this.forgotState.timerInterval = null;
+    }
+    this.hideForgotAlert();
+  }
+
+  showForgotStep(step) {
+    this.hideForgotAlert();
+    if (this.stepEmail) this.stepEmail.style.display = step === "email" ? "block" : "none";
+    if (this.stepOtp) this.stepOtp.style.display = step === "otp" ? "block" : "none";
+    if (this.stepReset) this.stepReset.style.display = step === "reset" ? "block" : "none";
+    if (this.stepSuccess) this.stepSuccess.style.display = step === "success" ? "block" : "none";
+
+    if (step === "otp" && this.otpCodeInput) {
+      setTimeout(() => this.otpCodeInput.focus(), 100);
+    } else if (step === "reset" && this.newPasswordInput) {
+      setTimeout(() => this.newPasswordInput.focus(), 100);
+    }
+  }
+
+  showForgotAlert(type, message) {
+    if (!this.forgotModalAlert) return;
+    this.forgotModalAlert.className = `auth-alert ${type}`;
+    this.forgotModalAlert.textContent = message;
+    this.forgotModalAlert.style.display = "block";
+  }
+
+  hideForgotAlert() {
+    if (!this.forgotModalAlert) return;
+    this.forgotModalAlert.style.display = "none";
+  }
+
+  startOtpTimer(durationSeconds = 600) {
+    if (this.forgotState.timerInterval) {
+      clearInterval(this.forgotState.timerInterval);
+    }
+    let timeLeft = durationSeconds;
+
+    const updateDisplay = () => {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      if (this.otpTimerDisplay) {
+        this.otpTimerDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(this.forgotState.timerInterval);
+        this.forgotState.timerInterval = null;
+        if (this.otpTimerDisplay) {
+          this.otpTimerDisplay.textContent = "Expired";
+        }
+      } else {
+        timeLeft--;
+      }
+    };
+
+    updateDisplay();
+    this.forgotState.timerInterval = setInterval(updateDisplay, 1000);
+  }
+
+  async handleForgotEmailSubmit(e) {
+    e.preventDefault();
+    this.hideForgotAlert();
+
+    const email = this.forgotEmailInput.value.trim();
+    if (!email) {
+      this.showForgotAlert("error", "Please enter your registered email address.");
+      return;
+    }
+
+    this.setButtonLoading(this.sendOtpBtn, true);
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        this.forgotState.email = email;
+        if (this.displayTargetEmail) {
+          this.displayTargetEmail.textContent = email;
+        }
+        if (this.otpCodeInput) {
+          this.otpCodeInput.value = "";
+        }
+        this.showForgotStep("otp");
+        this.startOtpTimer(600); // 10 minutes
+        this.showForgotAlert("success", result.message || "OTP code dispatched! Check your email inbox.");
+      } else {
+        this.showForgotAlert("error", result.message || "Failed to send reset code. Please try again.");
+      }
+    } catch (err) {
+      console.error("Forgot password request failed:", err);
+      this.showForgotAlert("error", "Network error. Please make sure the server is reachable.");
+    } finally {
+      this.setButtonLoading(this.sendOtpBtn, false);
+    }
+  }
+
+  async handleVerifyOtpSubmit(e) {
+    e.preventDefault();
+    this.hideForgotAlert();
+
+    const otp = this.otpCodeInput.value.trim();
+    if (!otp || otp.length !== 6) {
+      this.showForgotAlert("error", "Please enter a valid 6-digit code.");
+      return;
+    }
+
+    this.setButtonLoading(this.verifyOtpBtn, true);
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: this.forgotState.email, otp }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        this.forgotState.otp = otp;
+        this.showForgotStep("reset");
+        this.showForgotAlert("success", "OTP code verified successfully! Set your new password.");
+      } else {
+        this.showForgotAlert("error", result.message || "Invalid or expired OTP code.");
+      }
+    } catch (err) {
+      console.error("OTP verification error:", err);
+      this.showForgotAlert("error", "Network error during verification.");
+    } finally {
+      this.setButtonLoading(this.verifyOtpBtn, false);
+    }
+  }
+
+  async handleResendOtp() {
+    this.hideForgotAlert();
+    if (!this.forgotState.email) {
+      this.showForgotStep("email");
+      return;
+    }
+
+    if (this.resendOtpBtn) {
+      this.resendOtpBtn.disabled = true;
+      this.resendOtpBtn.textContent = "Sending...";
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: this.forgotState.email }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        this.startOtpTimer(600);
+        this.showForgotAlert("success", "A fresh 6-digit code has been sent to your email!");
+      } else {
+        this.showForgotAlert("error", result.message || "Could not resend OTP.");
+      }
+    } catch (err) {
+      this.showForgotAlert("error", "Network error while resending OTP.");
+    } finally {
+      if (this.resendOtpBtn) {
+        this.resendOtpBtn.disabled = false;
+        this.resendOtpBtn.textContent = "Resend Code";
+      }
+    }
+  }
+
+  async handleResetPasswordSubmit(e) {
+    e.preventDefault();
+    this.hideForgotAlert();
+
+    const newPassword = this.newPasswordInput.value;
+    const confirmPassword = this.confirmPasswordInput.value;
+
+    if (!newPassword || newPassword.length < 6) {
+      this.showForgotAlert("error", "New password must be at least 6 characters long.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      this.showForgotAlert("error", "Passwords do not match. Please re-enter.");
+      return;
+    }
+
+    this.setButtonLoading(this.resetPasswordBtn, true);
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: this.forgotState.email,
+          otp: this.forgotState.otp,
+          newPassword,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        if (this.forgotState.timerInterval) {
+          clearInterval(this.forgotState.timerInterval);
+          this.forgotState.timerInterval = null;
+        }
+        this.showForgotStep("success");
+      } else {
+        this.showForgotAlert("error", result.message || "Failed to reset password. Please try again.");
+      }
+    } catch (err) {
+      console.error("Reset password error:", err);
+      this.showForgotAlert("error", "Network error while updating password.");
+    } finally {
+      this.setButtonLoading(this.resetPasswordBtn, false);
+    }
   }
 }
 

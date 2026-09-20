@@ -5,6 +5,53 @@
 
 const API_BASE = "http://localhost:5000/api/v1";
 
+// Reusable Logout Confirmation Modal
+function showLogoutConfirmModal(onConfirm) {
+  let existingModal = document.getElementById("logoutConfirmModal");
+  if (existingModal) existingModal.remove();
+
+  const backdrop = document.createElement("div");
+  backdrop.id = "logoutConfirmModal";
+  backdrop.className = "confirm-modal-backdrop";
+  backdrop.innerHTML = `
+    <div class="confirm-modal-card">
+      <div class="confirm-modal-icon danger">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </div>
+      <h3 class="confirm-modal-title">Sign Out of DishDiary?</h3>
+      <p class="confirm-modal-desc">Are you sure you want to sign out? You will need to sign back in to publish dishes or access your saved bookmarks.</p>
+      <div class="confirm-modal-actions">
+        <button type="button" class="btn btn-outline" id="cancelLogoutModalBtn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmLogoutModalBtn" style="background: #dc2626; border-color: #dc2626; box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);">
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  const close = () => {
+    backdrop.classList.add("fade-out");
+    setTimeout(() => backdrop.remove(), 150);
+  };
+
+  backdrop.querySelector("#cancelLogoutModalBtn").addEventListener("click", close);
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  backdrop.querySelector("#confirmLogoutModalBtn").addEventListener("click", () => {
+    close();
+    if (typeof onConfirm === "function") onConfirm();
+  });
+}
+window.showLogoutConfirmModal = showLogoutConfirmModal;
+
 class ProfileManager {
   constructor() {
     this.user = null;
@@ -594,12 +641,14 @@ class ProfileManager {
   }
 
   handleSignOut() {
-    localStorage.removeItem("dishdiary_token");
-    localStorage.removeItem("dishdiary_user");
-    this.showToast("Signed out successfully");
-    setTimeout(() => {
-      window.location.href = "./index.html";
-    }, 600);
+    showLogoutConfirmModal(() => {
+      localStorage.removeItem("dishdiary_token");
+      localStorage.removeItem("dishdiary_user");
+      this.showToast("Signed out successfully");
+      setTimeout(() => {
+        window.location.href = "./index.html";
+      }, 500);
+    });
   }
 
   showToast(message) {

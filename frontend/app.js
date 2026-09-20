@@ -408,6 +408,15 @@ class DishDiaryApp {
       this.render();
     });
 
+    // Carousel Arrow Buttons (Prev < / Next >)
+    document.getElementById("prevRecipeBtn")?.addEventListener("click", () => {
+      window.scrollBy({ top: -380, behavior: "smooth" });
+    });
+
+    document.getElementById("nextRecipeBtn")?.addEventListener("click", () => {
+      window.scrollBy({ top: 380, behavior: "smooth" });
+    });
+
     // Reset button in empty state
     document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
       this.searchQuery = "";

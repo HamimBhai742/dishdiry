@@ -700,6 +700,50 @@ button, input, select, textarea {
   border-color: var(--primary);
 }
 
+/* Figma Carousel Arrow Buttons (The two circular buttons from the design) */
+.carousel-nav-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.carousel-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.carousel-nav-btn.prev-btn {
+  background-color: var(--primary-light);
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+}
+
+.carousel-nav-btn.prev-btn:hover {
+  background-color: var(--primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px var(--primary-glow);
+}
+
+.carousel-nav-btn.next-btn {
+  background-color: #ffffff;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.carousel-nav-btn.next-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+
 /* Recipe Grid */
 .recipes-grid {
   display: grid;

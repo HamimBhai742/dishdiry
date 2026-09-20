@@ -372,6 +372,22 @@ class DishDiaryApp {
       this.render();
     });
 
+    // Diet & Mood Cards Click Binding
+    document.querySelectorAll(".mood-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const mood = card.dataset.mood;
+        if (!mood) return;
+
+        this.activeCategory = mood;
+        this.categoryTabs.querySelectorAll(".category-pill").forEach(p => {
+          p.classList.toggle("active", p.dataset.category.toLowerCase() === mood.toLowerCase());
+        });
+        this.render();
+        const recipesSection = document.getElementById("recipes");
+        if (recipesSection) recipesSection.scrollIntoView({ behavior: "smooth" });
+      });
+    });
+
     // Search Input
     this.searchInput.addEventListener("input", (e) => {
       this.searchQuery = e.target.value.trim().toLowerCase();

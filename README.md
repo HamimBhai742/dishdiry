@@ -127,7 +127,7 @@ Ensure you have the following installed on your machine:
    Create a `.env` file in the `backend/` root:
    ```env
    NODE_ENV=development
-   PORT=5000
+   PORT=5942
    DATABASE_URL="mongodb+srv://<username>:<password>@cluster0.mongodb.net/dishdiary?retryWrites=true&w=majority"
    JWT_SECRET="super_secret_dishdiary_jwt_key_2026"
    JWT_EXPIRES_IN="7d"
@@ -147,7 +147,7 @@ Ensure you have the following installed on your machine:
    ```bash
    npm run dev
    ```
-   *The backend will boot up at `http://localhost:5000`.*
+   *The backend will boot up at `http://localhost:5942`.*
 
 ---
 

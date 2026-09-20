@@ -419,7 +419,7 @@ class RecipeDetailPage {
     const id = params.get("id");
     if (!id) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/v1/recipes/${id}`);
+      const res = await fetch(`http://localhost:5942/api/v1/recipes/${id}`);
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {

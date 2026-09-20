@@ -306,12 +306,17 @@ class RecipeDetailPage {
             <div style="padding: 6px 12px; font-size: 0.78rem; color: #94a3b8; border-bottom: 1px solid #f1f5f9;">
               Chef Account<br><strong style="color: #334155;">${user.email || ""}</strong>
             </div>
-            <a href="./add-recipe.html" class="nav-user-item">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>Publish Recipe</span>
+            <a href="./add-recipe.html" class="nav-user-item" id="menuAddRecipeBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Add Recipe</span>
             </a>
+            <a href="./index.html#recipes" class="nav-user-item" id="menuMyRecipesBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <span>My Recipes</span>
+            </a>
+            <div style="height: 1px; background: #f1f5f9; margin: 4px 0;"></div>
             <button type="button" class="nav-user-item logout" id="logoutBtn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
               <span>Sign Out</span>
             </button>
           </div>

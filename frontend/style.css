@@ -3619,10 +3619,10 @@ button, input, select, textarea {
   }
 }
 
-/* Hide Add Recipe button when logged in */
-body.user-logged-in #openAddRecipeBtn,
+/* Hide top-level Add Recipe button in navbar when logged in */
+body.user-logged-in .nav-actions > #openAddRecipeBtn,
 body.user-logged-in #mobileAddRecipeBtn,
-body.user-logged-in .nav-actions a[href*="add-recipe.html"] {
+body.user-logged-in .nav-actions > a[href*="add-recipe.html"] {
   display: none !important;
 }
 

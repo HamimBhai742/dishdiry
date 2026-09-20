@@ -418,8 +418,9 @@ class RecipeDetailPage {
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
     if (!id) return;
+    const apiBase = window.API_BASE || "http://localhost:5942/api/v1";
     try {
-      const res = await fetch(`http://localhost:5942/api/v1/recipes/${id}`);
+      const res = await fetch(`${apiBase}/recipes/${id}`);
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {

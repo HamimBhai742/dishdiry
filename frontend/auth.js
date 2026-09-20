@@ -5,7 +5,7 @@
  * - POST /api/v1/auth/register
  */
 
-const API_BASE = "http://localhost:5942/api/v1";
+const API_BASE = window.API_BASE || "http://localhost:5942/api/v1";
 
 class AuthManager {
   constructor() {
@@ -210,7 +210,7 @@ class AuthManager {
     } catch (err) {
       console.warn("Backend login connection issue:", err);
       // Fallback check in case backend server is temporarily paused
-      this.showAlert("error", "Unable to connect to server. Ensure backend is running on http://localhost:5942");
+      this.showAlert("error", `Unable to connect to server. Ensure backend is reachable at ${API_BASE}`);
     } finally {
       this.setButtonLoading(this.loginSubmitBtn, false);
     }
@@ -284,7 +284,7 @@ class AuthManager {
       }
     } catch (err) {
       console.warn("Backend registration error:", err);
-      this.showAlert("error", "Could not connect to backend server. Make sure server is running on port 5942.");
+      this.showAlert("error", `Could not connect to backend server. Make sure server is running at ${API_BASE}`);
     } finally {
       this.setButtonLoading(this.registerSubmitBtn, false);
     }

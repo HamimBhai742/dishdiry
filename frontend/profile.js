@@ -3,7 +3,7 @@
  * Manages user profile information, published recipes, saved dishes, and profile editing.
  */
 
-const API_BASE = "http://localhost:5942/api/v1";
+const API_BASE = window.API_BASE || "http://localhost:5942/api/v1";
 
 // Reusable Logout Confirmation Modal
 function showLogoutConfirmModal(onConfirm) {

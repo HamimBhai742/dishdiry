@@ -440,7 +440,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (currentUploadedPublicId || (currentUploadedUrl && (currentUploadedUrl.includes("res.cloudinary.com") || currentUploadedUrl.includes("/uploads/")))) {
       const oldPublicId = currentUploadedPublicId;
       const oldUrl = currentUploadedUrl;
-      fetch("http://localhost:5942/api/v1/upload", {
+      const apiBase = window.API_BASE || "http://localhost:5942/api/v1";
+      fetch(`${apiBase}/upload`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ public_id: oldPublicId, url: oldUrl }),
@@ -466,7 +467,8 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append("image", file);
 
     try {
-      const res = await fetch("http://localhost:5942/api/v1/upload", {
+      const apiBase = window.API_BASE || "http://localhost:5942/api/v1";
+      const res = await fetch(`${apiBase}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -568,7 +570,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (publicIdToDelete || (urlToDelete && (urlToDelete.includes("res.cloudinary.com") || urlToDelete.includes("/uploads/")))) {
         try {
           if (uploadText) uploadText.textContent = "Deleting image from Cloudinary...";
-          await fetch("http://localhost:5942/api/v1/upload", {
+          const apiBase = window.API_BASE || "http://localhost:5942/api/v1";
+          await fetch(`${apiBase}/upload`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -699,7 +702,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Attempt to persist to MongoDB Atlas backend API
       try {
-        const res = await fetch("http://localhost:5942/api/v1/recipes", {
+        const apiBase = window.API_BASE || "http://localhost:5942/api/v1";
+        const res = await fetch(`${apiBase}/recipes`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -428,8 +428,9 @@ class DishDiaryApp {
   }
 
   async fetchRecipesFromAPI() {
+    const apiBase = window.API_BASE || "http://localhost:5942/api/v1";
     try {
-      const res = await fetch("http://localhost:5942/api/v1/recipes");
+      const res = await fetch(`${apiBase}/recipes`);
       if (res.ok) {
         const json = await res.json();
         if (json.success && Array.isArray(json.data) && json.data.length > 0) {
@@ -1474,7 +1475,9 @@ class DishDiaryApp {
 
 // REST Backend Integration Helper (Ready to connect with scaffolded backend)
 window.DishDiaryAPI = {
-  baseUrl: "http://localhost:5942/api/v1",
+  get baseUrl() {
+    return window.API_BASE || "http://localhost:5942/api/v1";
+  },
   async fetchRecipes() {
     try {
       const res = await fetch(`${this.baseUrl}/recipes`);

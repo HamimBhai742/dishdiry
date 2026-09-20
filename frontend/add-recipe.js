@@ -440,7 +440,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = descInput.value.trim();
     const rawIngredients = ingTextarea.value.trim();
     const rawInstructions = stepsTextarea.value.trim();
-    const author = authorNameInput.value.trim() || "You (Chef)";
+    const userJson = localStorage.getItem("dishdiary_user");
+    let currentUser = null;
+    try {
+      currentUser = userJson ? JSON.parse(userJson) : null;
+    } catch (e) {}
+
+    const author = (currentUser && currentUser.name)
+      ? currentUser.name
+      : (authorNameInput.value.trim() || "You (Chef)");
     const authorRole = authorRoleInput.value.trim() || "Home Chef";
 
     const newRecipe = {
@@ -454,6 +462,8 @@ document.addEventListener("DOMContentLoaded", () => {
       rating: 5.0,
       reviewsCount: 1,
       author,
+      authorEmail: currentUser ? currentUser.email : "",
+      userId: currentUser ? currentUser.id : "",
       authorRole,
       authorAvatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80",
       image: imageUrl,
@@ -489,8 +499,18 @@ document.addEventListener("DOMContentLoaded", () => {
       if (res.ok) {
         const json = await res.json();
         if (json.data && (json.data.id || json.data._id)) {
-          newRecipe.id = json.data.id || json.data._id;
-          console.log("[DishDiary] Successfully saved recipe to MongoDB Atlas:", newRecipe.id);
+          const apiId = json.data.id || json.data._id;
+          newRecipe.id = apiId;
+          console.log("[DishDiary] Successfully saved recipe to MongoDB Atlas:", apiId);
+
+          // Track in my_recipe_ids
+          try {
+            const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]");
+            if (!myIds.includes(apiId)) {
+              myIds.unshift(apiId);
+              localStorage.setItem("dishdiary_my_recipe_ids", JSON.stringify(myIds));
+            }
+          } catch (idErr) {}
         }
       }
     } catch (apiErr) {
@@ -503,6 +523,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const list = stored ? JSON.parse(stored) : [];
       list.unshift(newRecipe);
       localStorage.setItem("dishdiary_custom_recipes", JSON.stringify(list));
+
+      // Track in my_recipe_ids
+      const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]");
+      if (!myIds.includes(newRecipe.id)) {
+        myIds.unshift(newRecipe.id);
+        localStorage.setItem("dishdiary_my_recipe_ids", JSON.stringify(myIds));
+      }
     } catch (err) {
       console.error("Failed to save recipe locally", err);
     }

@@ -732,14 +732,33 @@ class DishDiaryApp {
       } else if (this.activeCategory === "My Recipes") {
         const userJson = localStorage.getItem("dishdiary_user");
         let uName = "";
+        let uEmail = "";
+        let uId = "";
         try {
           const u = userJson ? JSON.parse(userJson) : null;
-          uName = (u?.name || "").toLowerCase();
+          uName = (u?.name || "").trim().toLowerCase();
+          uEmail = (u?.email || "").trim().toLowerCase();
+          uId = String(u?.id || "");
         } catch (e) {}
-        const author = (recipe.author || "").toLowerCase();
-        const isMyAuthor = uName && author.includes(uName);
-        const isCustom = recipe.id && (String(recipe.id).startsWith("dish-custom") || author.includes("you"));
-        if (!isMyAuthor && !isCustom) return false;
+
+        const myIds = JSON.parse(localStorage.getItem("dishdiary_my_recipe_ids") || "[]").map(String);
+        const customRecipes = JSON.parse(localStorage.getItem("dishdiary_custom_recipes") || "[]");
+        const customIds = customRecipes.map(c => String(c.id));
+
+        const recipeId = String(recipe.id || recipe._id || "");
+        const author = (recipe.author || "").trim().toLowerCase();
+        const recipeEmail = (recipe.userEmail || recipe.authorEmail || "").trim().toLowerCase();
+        const recipeUserId = String(recipe.userId || "");
+
+        // STRICT MATCH: ONLY show recipes created by this specific user
+        const isMyId = myIds.includes(recipeId) || customIds.includes(recipeId);
+        const isMyUserId = uId && recipeUserId && recipeUserId === uId;
+        const isMyEmail = uEmail && recipeEmail && recipeEmail === uEmail;
+        const isMyAuthorName = uName && author && (author === uName || author === `chef ${uName}`);
+
+        if (!isMyId && !isMyUserId && !isMyEmail && !isMyAuthorName) {
+          return false;
+        }
       } else if (this.activeCategory && this.activeCategory !== "All") {
         const cat = (recipe.category || "").toLowerCase();
         const activeCat = this.activeCategory.toLowerCase();
@@ -1227,11 +1246,50 @@ class DishDiaryApp {
     this.updateBookmarkCounts();
     this.updateHeroBookmarkState();
 
+    // Dynamically update section header based on active category
+    const titleEl = document.querySelector(".recipes-section .section-title");
+    const subEl = document.querySelector(".recipes-section .section-subtitle");
+    if (this.activeCategory === "My Recipes") {
+      if (titleEl) titleEl.textContent = "My Recipes";
+      if (subEl) subEl.textContent = "Dishes created and published by you";
+    } else if (this.activeCategory === "Saved") {
+      if (titleEl) titleEl.textContent = "Saved Recipes";
+      if (subEl) subEl.textContent = "Your personal culinary bookmark collection";
+    } else {
+      if (titleEl) titleEl.textContent = "Latest Recipes";
+      if (subEl) subEl.textContent = "Handcrafted dishes tested by culinary enthusiasts";
+    }
+
     const filtered = this.getFilteredRecipes();
     this.countEl.textContent = filtered.length;
 
     if (filtered.length === 0) {
       this.gridEl.innerHTML = "";
+      if (this.activeCategory === "My Recipes") {
+        this.emptyStateEl.innerHTML = `
+          <div class="empty-state-icon">👨‍🍳</div>
+          <h3>You haven't added any recipes yet</h3>
+          <p>Share your favorite cooking secrets and dishes with DishDiary!</p>
+          <a href="./add-recipe.html" class="btn btn-primary" style="margin-top: 14px; display: inline-flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Add Your First Recipe</span>
+          </a>
+        `;
+      } else {
+        this.emptyStateEl.innerHTML = `
+          <div class="empty-state-icon">🍲</div>
+          <h3>No matching recipes found</h3>
+          <p>Try searching for another keyword or selecting a different category.</p>
+          <button class="btn btn-outline" id="resetFiltersBtn">Reset All Filters</button>
+        `;
+        document.getElementById("resetFiltersBtn")?.addEventListener("click", () => {
+          this.activeCategory = "All";
+          this.searchQuery = "";
+          if (this.searchInput) this.searchInput.value = "";
+          this.categoryTabs?.querySelectorAll(".category-pill").forEach(p => p.classList.toggle("active", p.dataset.category === "All"));
+          this.render();
+        });
+      }
       this.emptyStateEl.classList.remove("hidden");
       return;
     }

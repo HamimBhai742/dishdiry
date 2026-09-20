@@ -492,11 +492,15 @@
           <span class="badge badge-accent">Daily Food Inspiration</span>
           <h2>Join 45,000+ home cooks in the DishDiary club</h2>
           <p>Get weekend menu ideas, seasonal ingredients guide, and chef techniques delivered straight to your inbox.</p>
-          <form class="newsletter-form" id="newsletterForm" onsubmit="event.preventDefault(); alert('Thank you for subscribing to DishDiary!'); this.reset();">
-            <input type="email" placeholder="Enter your email address..." required>
-            <button type="submit" class="btn btn-primary">Subscribe</button>
-          </form>
-          <span class="newsletter-hint">No spam, unsubscribe anytime. Free recipes every Friday.</span>
+          <div id="newsletterBox" class="newsletter-box">
+            <form class="newsletter-form" id="newsletterForm">
+              <input type="email" id="newsletterEmail" placeholder="Enter your email address..." required autocomplete="email">
+              <button type="submit" class="btn btn-primary" id="newsletterSubmitBtn">
+                <span>Subscribe</span>
+              </button>
+            </form>
+            <span class="newsletter-hint" id="newsletterHint">No spam, unsubscribe anytime. Free recipes every Friday.</span>
+          </div>
         </div>
       </div>
     </section>

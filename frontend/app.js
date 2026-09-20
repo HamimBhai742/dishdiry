@@ -282,6 +282,27 @@ class DishDiaryApp {
     this.bindEvents();
     this.setupHeroCarousel();
     this.render();
+    this.fetchRecipesFromAPI();
+  }
+
+  async fetchRecipesFromAPI() {
+    try {
+      const res = await fetch("http://localhost:5000/api/v1/recipes");
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const mongoRecipes = json.data.map(r => ({
+            ...r,
+            id: r.id || r._id,
+          }));
+          this.recipes = mongoRecipes;
+          this.render();
+          console.log(`[DishDiary] Synced ${this.recipes.length} recipes from MongoDB Atlas`);
+        }
+      }
+    } catch (e) {
+      console.log("[DishDiary] Running in local offline mode (fallback)");
+    }
   }
 
   // LocalStorage handling

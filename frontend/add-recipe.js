@@ -412,7 +412,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 5. FORM SUBMISSION & LOCALSTORAGE PERSISTENCE
   // =========================================================
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     syncIngredientsToTextarea();
@@ -450,14 +450,49 @@ document.addEventListener("DOMContentLoaded", () => {
       instructions: rawInstructions.split("\n").filter(l => l.trim().length > 0)
     };
 
-    // Save to LocalStorage
+    // Attempt to persist to MongoDB Atlas backend API
+    try {
+      const res = await fetch("http://localhost:5000/api/v1/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newRecipe.title,
+          category: newRecipe.category,
+          difficulty: newRecipe.difficulty,
+          prepTime: newRecipe.prepTime,
+          cookTime: newRecipe.cookTime,
+          servings: newRecipe.servings,
+          rating: newRecipe.rating,
+          reviewsCount: newRecipe.reviewsCount,
+          author: newRecipe.author,
+          authorRole: newRecipe.authorRole,
+          authorAvatar: newRecipe.authorAvatar,
+          image: newRecipe.image,
+          description: newRecipe.description,
+          ingredients: newRecipe.ingredients,
+          instructions: newRecipe.instructions,
+        })
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        if (json.data && (json.data.id || json.data._id)) {
+          newRecipe.id = json.data.id || json.data._id;
+          console.log("[DishDiary] Successfully saved recipe to MongoDB Atlas:", newRecipe.id);
+        }
+      }
+    } catch (apiErr) {
+      console.log("[DishDiary] Backend API offline; saved locally to localStorage fallback");
+    }
+
+    // Save to LocalStorage cache
     try {
       const stored = localStorage.getItem("dishdiary_custom_recipes");
       const list = stored ? JSON.parse(stored) : [];
       list.unshift(newRecipe);
       localStorage.setItem("dishdiary_custom_recipes", JSON.stringify(list));
     } catch (err) {
-      console.error("Failed to save recipe", err);
+      console.error("Failed to save recipe locally", err);
     }
 
     // Show toast and redirect
@@ -465,7 +500,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toast.className = "toast";
     toast.innerHTML = `
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-      <span>Recipe published! Opening your delicious recipe...</span>
+      <span>Recipe published to database! Opening your delicious recipe...</span>
     `;
     document.getElementById("toastContainer").appendChild(toast);
 

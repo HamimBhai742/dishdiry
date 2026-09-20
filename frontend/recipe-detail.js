@@ -277,6 +277,29 @@ class RecipeDetailPage {
     this.timerSecondsRemaining = 0;
 
     this.init();
+    this.fetchRecipeFromAPI();
+  }
+
+  async fetchRecipeFromAPI() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    if (!id) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/v1/recipes/${id}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          const remote = {
+            ...json.data,
+            id: json.data.id || json.data._id,
+          };
+          this.currentRecipe = remote;
+          this.init();
+        }
+      }
+    } catch (e) {
+      // Offline mode fallback is already rendered
+    }
   }
 
   loadAllRecipes() {
